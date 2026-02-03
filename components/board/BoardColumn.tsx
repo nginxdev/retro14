@@ -76,8 +76,8 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
     const isSortedByAuthor = globalViewConfig.sortBy === 'author' || viewState.isSorted;
     const uniqueAuthors = getUniqueAuthors(items);
 
-    let publishedItems = items.filter(i => !i.is_staged && !i.parent_id);
-    let stagedItems = items.filter(i => i.is_staged && !i.parent_id);
+    const publishedItems = items.filter(i => !i.is_staged && !i.parent_id);
+    const stagedItems = items.filter(i => i.is_staged && !i.parent_id);
 
     // Apply Sorting if enabled
     if (isSortedByAuthor) {
