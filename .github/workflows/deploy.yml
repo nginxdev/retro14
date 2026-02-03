@@ -33,5 +33,3 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: retro14
           directory: dist
-          # Optional: Enable deployment to production environment
-          # gitHubToken: ${{ secrets.GITHUB_TOKEN }}
