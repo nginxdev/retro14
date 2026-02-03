@@ -1,0 +1,29 @@
+
+{
+  "name": "retro14",
+  "version": "1.0.0",
+  "description": "The collaborative retrospective tool for high-performing agile teams.",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.263.1",
+    "@google/genai": "^1.39.0",
+    "@supabase/supabase-js": "^2.39.3"
+  },
+  "keywords": [
+    "agile",
+    "retrospective",
+    "scrum",
+    "collaboration",
+    "retro14",
+    "nginxdev"
+  ],
+  "author": "nginxdev",
+  "license": "MIT"
+}
