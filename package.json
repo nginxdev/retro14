@@ -1,4 +1,3 @@
-
 {
   "name": "retro14",
   "version": "1.0.0",
@@ -10,26 +9,28 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "lucide-react": "^0.263.1",
-    "@google/genai": "^1.39.0",
-    "@supabase/supabase-js": "^2.39.3"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
-    "@vitejs/plugin-react": "^4.2.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "@google/genai": "^1.39.0"
   },
   "keywords": [
     "agile",
     "retrospective",
     "scrum",
     "collaboration",
-    "retro14"
+    "retro14",
+    "nginxdev"
   ],
-  "author": "Retro14 Team",
-  "license": "MIT"
+  "author": "nginxdev",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.1.3",
+    "globals": "^17.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
 }
