@@ -59,8 +59,9 @@ export const colors = {
  */
 export const getThemeColors = (theme: string) => {
     switch (theme) {
-      case 'green': return { bg: 'bg-g50', text: 'text-g400', border: 'border-g100' }; // g100 approx via theme config if needed, or stick to n40
-      case 'red': return { bg: 'bg-r50', text: 'text-r500', border: 'border-r100' };
+      // Use g200/r300/b100/p100/y400/n50 to ensure tokens exist in index.html config
+      case 'green': return { bg: 'bg-g50', text: 'text-g400', border: 'border-g200' };
+      case 'red': return { bg: 'bg-r50', text: 'text-r500', border: 'border-r300' }; // r300 is closest to a border color in this set
       case 'blue': return { bg: 'bg-b50', text: 'text-b500', border: 'border-b100' };
       case 'yellow': return { bg: 'bg-y50', text: 'text-n800', border: 'border-y400' };
       case 'purple': return { bg: 'bg-p50', text: 'text-p500', border: 'border-p100' };

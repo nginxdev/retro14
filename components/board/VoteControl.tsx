@@ -14,7 +14,7 @@ interface VoteControlProps {
 }
 
 export const VoteControl: React.FC<VoteControlProps> = ({ itemId, votes, allVotes, isVotingActive, votingConfig, userVotesUsed, onVote }) => {
-     const totalVotes = Object.values(allVotes || {}).reduce((a, b) => a + b, 0);
+     const totalVotes = (Object.values(allVotes || {}) as number[]).reduce((a, b) => a + b, 0);
      
      if (!isVotingActive && totalVotes === 0) return null;
 

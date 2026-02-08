@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Column, RetroItem, User, VotingConfig } from '../types';
 import { BoardColumn } from './board/BoardColumn';
 import { ViewConfig } from '../hooks/useRetroBoard';
@@ -32,6 +32,7 @@ interface BoardProps {
   onToggleColumnVisibility: (columnId: string) => void;
   // Global View Config
   viewConfig: ViewConfig;
+  isCardOverviewEnabled: boolean;
   isLoading: boolean;
 }
 
@@ -47,13 +48,14 @@ export const Board: React.FC<BoardProps> = ({
     isVotingActive, votingConfig, userVotesUsed, onVote,
     onAddActionItem, onToggleActionItem, onAddComment, onUpdateItemContent,
     hiddenColumnIds, onToggleColumnVisibility,
-    viewConfig, isLoading
+    viewConfig, isCardOverviewEnabled, isLoading
 }) => {
   const [draggedItemId, setDraggedItemId] = useState<string | null>(null);
   const [dragOverTargetId, setDragOverTargetId] = useState<string | null>(null);
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [columnViews, setColumnViews] = useState<Record<string, ColumnViewState>>({});
   const [maximizedColumnId, setMaximizedColumnId] = useState<string | null>(null);
+  const [activeInputColumnId, setActiveInputColumnId] = useState<string | null>(null);
 
   useEffect(() => {
     const initialViews: Record<string, ColumnViewState> = {};
@@ -111,7 +113,7 @@ export const Board: React.FC<BoardProps> = ({
       }
   };
 
-  const dragHandlers = {
+  const dragHandlers = useMemo(() => ({
       handleDragStart: (e: React.DragEvent, itemId: string) => {
           setDraggedItemId(itemId);
           e.dataTransfer.effectAllowed = 'move';
@@ -150,7 +152,7 @@ export const Board: React.FC<BoardProps> = ({
           setDraggedItemId(null);
       },
       setDragOverTargetId
-  };
+  }), [draggedItemId, items, onMoveItem, onGroupItem]);
 
   // Filter columns if maximized, then check hidden
   const visibleColumns = maximizedColumnId 
@@ -176,6 +178,8 @@ export const Board: React.FC<BoardProps> = ({
             expandedGroups={expandedGroups}
             isMaximized={maximizedColumnId === column.id}
             isLoading={isLoading}
+            activeInputColumnId={activeInputColumnId}
+            onInputActive={setActiveInputColumnId}
             onToggleMaximize={toggleMaximize}
             onMoveItem={onMoveItem}
             onAddItem={onAddItem}
@@ -196,6 +200,7 @@ export const Board: React.FC<BoardProps> = ({
             onHideColumn={onToggleColumnVisibility}
             dragHandlers={dragHandlers}
             globalViewConfig={viewConfig}
+            isCardOverviewEnabled={isCardOverviewEnabled}
           />
       ))}
     </div>

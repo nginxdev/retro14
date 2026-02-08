@@ -1,18 +1,22 @@
 
 import React, { useState } from 'react';
-import { X, Plus, Trash2, GripVertical } from 'lucide-react';
+import { X, Plus, Trash2, GripVertical, CreditCard } from 'lucide-react';
 import { Column } from '../types';
 
 interface BoardSettingsModalProps {
   columns: Column[];
+  isCardOverviewEnabled: boolean;
+  onToggleCardOverview: (enabled: boolean) => void;
   onSave: (columns: Column[]) => void;
   onClose: () => void;
 }
 
 const THEMES = ['green', 'red', 'blue', 'yellow', 'purple', 'gray'] as const;
 
-export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns, onSave, onClose }) => {
+export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns, isCardOverviewEnabled, onToggleCardOverview, onSave, onClose }) => {
   const [editedColumns, setEditedColumns] = useState<Column[]>([...columns]);
+  const [cardOverviewEnabled, setCardOverviewEnabled] = useState(isCardOverviewEnabled);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const handleTitleChange = (id: string, newTitle: string) => {
     setEditedColumns(prev => prev.map(c => c.id === id ? { ...c, title: newTitle } : c));
@@ -39,71 +43,145 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns,
     setEditedColumns(prev => [...prev, newCol]);
   };
 
+  const handleSaveAll = () => {
+    onSave(editedColumns);
+    onToggleCardOverview(cardOverviewEnabled);
+    onClose();
+  };
+
+  // Drag and Drop Handlers
+  const onDragStart = (e: React.DragEvent, index: number) => {
+      setDraggedIndex(index);
+      // Required for Firefox
+      e.dataTransfer.effectAllowed = "move";
+  };
+
+  const onDragOver = (e: React.DragEvent, index: number) => {
+      e.preventDefault();
+      if (draggedIndex === null || draggedIndex === index) return;
+      
+      const newCols = [...editedColumns];
+      const draggedItem = newCols[draggedIndex];
+      
+      // Remove dragged item
+      newCols.splice(draggedIndex, 1);
+      // Insert at new position
+      newCols.splice(index, 0, draggedItem);
+      
+      setEditedColumns(newCols);
+      setDraggedIndex(index);
+  };
+
+  const onDragEnd = () => {
+      setDraggedIndex(null);
+  };
+
   return (
     <div className="fixed inset-0 bg-[#091E42]/60 z-[100] flex items-center justify-center p-4 backdrop-blur-[1px]">
-      <div className="bg-white w-full max-w-2xl h-[70vh] rounded-lg shadow-xl flex flex-col animate-in zoom-in-95 duration-200">
+      <div className="bg-white w-full max-w-2xl h-[75vh] rounded-lg shadow-xl flex flex-col animate-in zoom-in-95 duration-200">
         <div className="p-5 border-b border-[#DFE1E6] flex justify-between items-center">
           <div>
               <h2 className="text-lg font-semibold text-[#172B4D]">Board Settings</h2>
-              <p className="text-sm text-[#5E6C84]">Manage columns and layout</p>
+              <p className="text-sm text-[#5E6C84]">Manage layout and interactions</p>
           </div>
           <button onClick={onClose}><X size={20} className="text-[#5E6C84]" /></button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-6 bg-[#FAFBFC]">
-            <div className="space-y-4">
-                {editedColumns.map((col, index) => (
-                    <div key={col.id} className="bg-white p-4 rounded border border-[#DFE1E6] shadow-sm flex items-center gap-4 group">
-                        <GripVertical className="text-[#DFE1E6] cursor-grab" size={20} />
-                        
-                        <div className="flex-1">
-                            <label className="text-[10px] font-bold uppercase text-[#5E6C84] mb-1 block">Column Title</label>
-                            <input 
-                                value={col.title}
-                                onChange={(e) => handleTitleChange(col.id, e.target.value)}
-                                className="w-full border border-[#DFE1E6] rounded px-2 py-1.5 text-sm font-medium text-[#172B4D] focus:ring-2 focus:ring-[#4C9AFF] focus:border-transparent outline-none"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="text-[10px] font-bold uppercase text-[#5E6C84] mb-1 block">Theme</label>
-                            <div className="flex gap-1">
-                                {THEMES.map(theme => (
-                                    <button 
-                                        key={theme}
-                                        onClick={() => handleThemeChange(col.id, theme)}
-                                        className={`w-6 h-6 rounded-full border-2 ${col.colorTheme === theme ? 'border-[#172B4D]' : 'border-transparent'} transition-all`}
-                                        style={{ backgroundColor: getThemeColor(theme) }}
-                                        title={theme}
-                                    />
-                                ))}
+        <div className="flex-1 overflow-y-auto p-6 bg-[#FAFBFC] space-y-6">
+            
+            {/* View Settings Section */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-[#5E6C84] uppercase tracking-wide">Interaction Settings</h3>
+                <div className="bg-white p-4 rounded border border-[#DFE1E6] shadow-sm">
+                    <label className="flex items-center justify-between cursor-pointer group">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#EAE6FF] text-[#403294] rounded">
+                                <CreditCard size={20} />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-medium text-[#172B4D]">Enable Card Overview</span>
+                                <span className="block text-xs text-[#5E6C84] mt-0.5">If disabled, clicking a card will enable inline editing immediately.</span>
                             </div>
                         </div>
-
-                        <div className="pt-4">
-                            <button 
-                                onClick={() => handleDelete(col.id)}
-                                className="p-2 text-[#5E6C84] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            >
-                                <Trash2 size={18} />
-                            </button>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only peer" 
+                                checked={cardOverviewEnabled}
+                                onChange={(e) => setCardOverviewEnabled(e.target.checked)}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0052CC]"></div>
                         </div>
-                    </div>
-                ))}
+                    </label>
+                </div>
+            </div>
 
-                <button 
-                    onClick={handleAdd}
-                    className="w-full py-3 border-2 border-dashed border-[#DFE1E6] rounded-lg text-[#5E6C84] font-medium hover:bg-[#EBECF0] hover:border-[#C1C7D0] transition-colors flex items-center justify-center gap-2"
-                >
-                    <Plus size={20} />
-                    Add Column
-                </button>
+            {/* Column Management Section */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-[#5E6C84] uppercase tracking-wide">Columns (Drag to Reorder)</h3>
+                <div className="space-y-3">
+                    {editedColumns.map((col, index) => (
+                        <div 
+                            key={col.id} 
+                            draggable
+                            onDragStart={(e) => onDragStart(e, index)}
+                            onDragOver={(e) => onDragOver(e, index)}
+                            onDragEnd={onDragEnd}
+                            className={`bg-white p-4 rounded border shadow-sm flex items-center gap-4 group transition-colors ${draggedIndex === index ? 'opacity-50 bg-[#EBECF0] border-dashed border-[#0052CC]' : 'border-[#DFE1E6]'}`}
+                        >
+                            <div className="cursor-grab active:cursor-grabbing text-[#DFE1E6] hover:text-[#5E6C84]">
+                                <GripVertical size={20} />
+                            </div>
+                            
+                            <div className="flex-1">
+                                <label className="text-[10px] font-bold uppercase text-[#5E6C84] mb-1 block">Column Title</label>
+                                <input 
+                                    value={col.title}
+                                    onChange={(e) => handleTitleChange(col.id, e.target.value)}
+                                    className="w-full border border-[#DFE1E6] rounded px-2 py-1.5 text-sm font-medium text-[#172B4D] focus:ring-2 focus:ring-[#4C9AFF] focus:border-transparent outline-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-[10px] font-bold uppercase text-[#5E6C84] mb-1 block">Theme</label>
+                                <div className="flex gap-1">
+                                    {THEMES.map(theme => (
+                                        <button 
+                                            key={theme}
+                                            onClick={() => handleThemeChange(col.id, theme)}
+                                            className={`w-6 h-6 rounded-full border-2 ${col.colorTheme === theme ? 'border-[#172B4D]' : 'border-transparent'} transition-all`}
+                                            style={{ backgroundColor: getThemeColor(theme) }}
+                                            title={theme}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="pt-4">
+                                <button 
+                                    onClick={() => handleDelete(col.id)}
+                                    className="p-2 text-[#5E6C84] hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+
+                    <button 
+                        onClick={handleAdd}
+                        className="w-full py-3 border-2 border-dashed border-[#DFE1E6] rounded-lg text-[#5E6C84] font-medium hover:bg-[#EBECF0] hover:border-[#C1C7D0] transition-colors flex items-center justify-center gap-2"
+                    >
+                        <Plus size={20} />
+                        Add Column
+                    </button>
+                </div>
             </div>
         </div>
 
         <div className="p-5 border-t border-[#DFE1E6] flex justify-end gap-3 bg-white">
           <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
-          <button onClick={() => { onSave(editedColumns); onClose(); }} className="px-4 py-2 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded shadow-sm">Save Changes</button>
+          <button onClick={handleSaveAll} className="px-4 py-2 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded shadow-sm">Save Changes</button>
         </div>
       </div>
     </div>

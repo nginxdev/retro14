@@ -29,6 +29,7 @@ interface RetroCardProps {
         handleCardDrop: (e: React.DragEvent, targetItemId: string) => void;
         setDragOverTargetId: (id: string | null) => void;
     };
+    isCardOverviewEnabled?: boolean;
 }
 
 /**
@@ -38,7 +39,8 @@ interface RetroCardProps {
 export const RetroCard: React.FC<RetroCardProps> = ({ 
     item, currentUser, isVotingActive, votingConfig, userVotesUsed, 
     dragOverTargetId, draggedItemId,
-    onVote, onReaction, onItemClick, onUpdateContent, dragHandlers 
+    onVote, onReaction, onItemClick, onUpdateContent, dragHandlers,
+    isCardOverviewEnabled = true
 }) => {
     const [hoveredReactionId, setHoveredReactionId] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
@@ -66,21 +68,29 @@ export const RetroCard: React.FC<RetroCardProps> = ({
         }
     };
 
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isEditing) return;
+
+        if (isCardOverviewEnabled) {
+            onItemClick(item);
+        } else {
+            setIsEditing(true);
+        }
+    };
+
     return (
         <div className="w-[135px] flex flex-col items-center transition-all duration-200">
             <div
                 draggable={!isEditing}
                 onDragStart={(e) => !isEditing && dragHandlers.handleDragStart(e, item.id)}
-                onClick={(e) => { 
-                    e.stopPropagation(); 
-                    if (!isEditing) onItemClick(item); 
-                }}
+                onClick={handleClick}
                 onDragOver={dragHandlers.handleDragOver}
                 onDragEnter={(e) => dragHandlers.handleCardDragEnter(e, item.id)}
                 onDragLeave={() => dragHandlers.setDragOverTargetId(null)}
                 onDrop={(e) => dragHandlers.handleCardDrop(e, item.id)}
                 className={`
-                    relative bg-white rounded-lg shadow-sm border
+                    relative bg-white rounded-[3px] shadow-sm border
                     ${isTargeted ? 'border-b200 ring-2 ring-b200 ring-offset-1 animate-pulse z-10' : 'border-n40'}
                     ${isEditing ? 'ring-2 ring-b200 border-b200 cursor-text' : 'cursor-pointer hover:shadow-md'}
                     h-[150px] w-full
@@ -89,10 +99,11 @@ export const RetroCard: React.FC<RetroCardProps> = ({
                 `}
             >
                 {/* Author Color Strip */}
-                <div className="h-1.5 w-full rounded-t-lg shrink-0" style={{ backgroundColor: item.author_color || colors.n40 }}></div>
+                <div className="h-1.5 w-full rounded-t-[3px] shrink-0" style={{ backgroundColor: item.author_color || colors.n40 }}></div>
                 
                 {/* Controls Overlay - Edit (Top-Left) */}
-                {!isEditing && (
+                {/* Only show pencil if Overview is Enabled (since disabling it makes the whole card clickable for edit) */}
+                {!isEditing && isCardOverviewEnabled && (
                     <div className="absolute top-2 left-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
                          <button 
                             onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
@@ -154,10 +165,11 @@ export const RetroCard: React.FC<RetroCardProps> = ({
                 </div>
 
                 {/* Footer: Author Avatar & Reactions */}
-                <div className="min-h-[32px] flex items-center justify-between px-2 pb-2 bg-white rounded-b-lg shrink-0 w-full mt-auto gap-2">
+                <div className="min-h-[32px] flex items-center justify-between px-2 pb-2 bg-white rounded-b-[3px] shrink-0 w-full mt-auto gap-2">
                     <div 
                         className="w-4 h-4 rounded-full text-white text-[9px] font-bold flex items-center justify-center shadow-sm shrink-0"
                         style={{ backgroundColor: item.author_color || colors.n40 }}
+                        title={item.author_name}
                     >
                         {(item.author_name || 'U').charAt(0)}
                     </div>
@@ -174,7 +186,10 @@ export const RetroCard: React.FC<RetroCardProps> = ({
                             </button>
                         ))}
                         
-                        <div className="relative group/reaction shrink-0">
+                        <div 
+                            className="relative group/reaction shrink-0"
+                            onMouseLeave={() => setHoveredReactionId(null)}
+                        >
                             <button 
                                 className="p-0.5 rounded text-n90 hover:bg-n30 hover:text-n800 transition-colors"
                                 onMouseEnter={() => setHoveredReactionId(item.id)}
@@ -185,8 +200,7 @@ export const RetroCard: React.FC<RetroCardProps> = ({
                             {/* Reaction Picker Popup */}
                             {hoveredReactionId === item.id && (
                                 <div 
-                                    className="absolute bottom-full right-0 mb-1 bg-white shadow-lg rounded-full border border-n40 p-1 flex gap-1 animate-in zoom-in-95 duration-150 z-20"
-                                    onMouseLeave={() => setHoveredReactionId(null)}
+                                    className="absolute bottom-full right-0 bg-white shadow-lg rounded-full border border-n40 p-1 flex gap-1 animate-in zoom-in-95 duration-150 z-20"
                                 >
                                     {EMOJIS.map(emoji => (
                                         <button

@@ -36,6 +36,7 @@ export const useRetroBoard = () => {
   
   // View Configuration
   const [viewConfig, setViewConfig] = useState<ViewConfig>({ sortBy: 'none', groupBy: 'none' });
+  const [isCardOverviewEnabled, setIsCardOverviewEnabled] = useState(true);
   
   // User & Participants State
   const [currentUser, setCurrentUser] = useState<User>(INITIAL_USER);
@@ -91,7 +92,7 @@ export const useRetroBoard = () => {
 
       const votedItems = items.filter(item => {
           const votes = item.votes || {};
-          const total = Object.values(votes).reduce((a, b) => a + b, 0);
+          const total = (Object.values(votes) as number[]).reduce((a, b) => a + b, 0);
           return total > 0;
       });
 
@@ -451,6 +452,7 @@ export const useRetroBoard = () => {
       userVotesUsed,
       hiddenColumnIds,
       viewConfig, setViewConfig,
+      isCardOverviewEnabled, setIsCardOverviewEnabled,
       isLoading,
       refreshData,
       handleStartVoting,

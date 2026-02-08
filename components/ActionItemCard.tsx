@@ -17,7 +17,7 @@ export const ActionItemCard: React.FC<ActionItemCardProps> = ({ item, childrenIt
     const [newCommentText, setNewCommentText] = useState('');
     const [showComments, setShowComments] = useState(false);
 
-    const totalVotes = Object.values(item.votes || {}).reduce((a, b) => a + b, 0);
+    const totalVotes = (Object.values(item.votes || {}) as number[]).reduce((a, b) => a + b, 0);
 
     const handleAddAction = () => {
         if (!newActionText.trim()) return;

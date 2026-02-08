@@ -13,13 +13,13 @@
 - **Grouping:** Drag and drop cards to group related thoughts.
 - **Action Items:** Track follow-up tasks directly within the board.
 - **Atlassian-inspired UI:** Clean, accessible, and familiar design system tokens.
-
+- **AI Assistant:** Integrated assistant to help grouped themes and analyze sentiment (powered by Gemini).
 
 ## Tech Stack
 
 - **Frontend:** React, TypeScript, Tailwind CSS
 - **Icons:** Lucide React
-
+- **AI:** Google Gemini API
 - **Backend:** Supabase (Optional/Configurable)
 
 ## Getting Started
