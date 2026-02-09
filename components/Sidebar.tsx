@@ -97,14 +97,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* Collapse Toggle Button - Jira Style (Overlapping border) */}
-      <div className="absolute -right-3 top-8 opacity-0 group-hover/sidebar:opacity-100 transition-opacity z-50">
-          <button 
-            onClick={onToggle}
-            className="w-6 h-6 bg-white border border-[#DFE1E6] rounded-full flex items-center justify-center shadow-sm hover:bg-[#0052CC] hover:border-[#0052CC] hover:text-white text-[#5E6C84] transition-colors"
-          >
-            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-          </button>
-      </div>
+      <button 
+        onClick={onToggle}
+        className="absolute -right-3.5 inset-y-1/2 -translate-y-1/2 w-7 h-7 bg-white border border-[#DFE1E6] rounded-full flex items-center justify-center shadow-md hover:bg-[#0052CC] hover:border-[#0052CC] hover:text-white text-[#5E6C84] transition-colors z-50"
+      >
+        {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+      </button>
 
       {/* Bottom User Profile Section */}
       <div className="p-3 border-t border-[#DFE1E6] space-y-3">
