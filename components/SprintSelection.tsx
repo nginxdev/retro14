@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { dataService } from '../services/dataService';
 import { User } from '../types';
-import { Loader2, Plus, Users, ArrowRight } from 'lucide-react';
+import { Loader2, Plus, Users, ArrowRight, History } from 'lucide-react';
+import { HistoryModal } from './HistoryModal';
 
 interface SprintSelectionProps {
   user: User;
@@ -16,6 +17,29 @@ export const SprintSelection: React.FC<SprintSelectionProps> = ({ user, onSprint
   const [joinCode, setJoinCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const handleHistorySelect = (code: string) => {
+    handleJoinSprintByCode(code);
+    setIsHistoryOpen(false);
+  };
+
+  const handleJoinSprintByCode = async (code: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const sprint = await dataService.joinSprint(code);
+      if (sprint) {
+        onSprintSelected(sprint.id, sprint.name, sprint.code);
+      } else {
+        setError('Sprint not found');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to join sprint');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateSprint = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +108,20 @@ export const SprintSelection: React.FC<SprintSelectionProps> = ({ user, onSprint
                 <div>
                   <h3 className="font-semibold text-n800">Join Existing Sprint</h3>
                   <p className="text-xs text-n300">Enter a code to join your team</p>
+                </div>
+                <ArrowRight size={16} className="ml-auto text-n100 group-hover:text-n300" />
+              </button>
+
+              <button
+                onClick={() => setIsHistoryOpen(true)}
+                className="w-full flex items-center p-4 border border-n40 rounded-[3px] hover:bg-n20 transition-colors group text-left"
+              >
+                <div className="w-10 h-10 bg-p50 text-p400 rounded-full flex items-center justify-center mr-4 group-hover:bg-p400 group-hover:text-white transition-colors">
+                  <History size={20} />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-n800">Open Older Boards</h3>
+                  <p className="text-xs text-n300">View your previous retrospectives</p>
                 </div>
                 <ArrowRight size={16} className="ml-auto text-n100 group-hover:text-n300" />
               </button>
@@ -162,6 +200,14 @@ export const SprintSelection: React.FC<SprintSelectionProps> = ({ user, onSprint
           )}
         </div>
       </div>
+
+      {isHistoryOpen && (
+        <HistoryModal
+          userId={user.id}
+          onClose={() => setIsHistoryOpen(false)}
+          onSelectSprint={handleHistorySelect}
+        />
+      )}
     </div>
   );
 };
