@@ -147,13 +147,13 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
            {/* Breadcrumbs */}
            <div className="flex items-center">
              <div className="text-sm breadcrumbs text-n300 flex items-center gap-2">
-               <span className="font-semibold text-n500 hover:text-b400 cursor-pointer">Retro14</span>
-               <span className="text-n300">/</span>
+               <span className="font-semibold text-n500 hover:text-b400 cursor-pointer hidden lg:inline">Retro14</span>
+               <span className="text-n300 hidden lg:inline">/</span>
                <span className="font-semibold text-n800">{sprintName || 'Current Sprint'}</span>
                <div className="h-4 w-px bg-n40 mx-2"></div>
                <div className="flex items-center gap-1 text-xs bg-g50 text-g400 px-2 py-0.5 rounded-full font-medium">
                   <span className="w-1.5 h-1.5 bg-g200 rounded-full animate-pulse"></span>
-                  Live
+                  <span>Live</span>
                </div>
              </div>
            </div>
@@ -173,9 +173,10 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                    <button 
                        onClick={() => setIsVotingConfigOpen(true)}
                        className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-n800 hover:bg-n30 text-xs font-medium transition-colors"
+                       title="Start Vote"
                    >
                        <Vote size={14} />
-                       Start Vote
+                       <span className="hidden lg:inline">Start Vote</span>
                    </button>
                ) : (
                    <div className="flex items-center gap-2 px-3 py-1.5 bg-g50 border border-g100 rounded-lg animate-in fade-in">
@@ -203,10 +204,11 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                  <button
                     onClick={() => setIsViewMenuOpen(!isViewMenuOpen)}
                     className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-xs text-n500 hover:bg-n30 transition-colors"
+                    title="View Options"
                  >
                      <Settings size={16} />
-                     <span>View Options</span>
-                     <ChevronDown size={14} />
+                     <span className="hidden lg:inline">View Options</span>
+                     <ChevronDown size={14} className="hidden lg:inline" />
                  </button>
                  
                  {isViewMenuOpen && (
