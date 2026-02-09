@@ -12,10 +12,11 @@ interface SidebarProps {
   onOpenTeam: () => void;
   onOpenHistory: () => void;
   onSwitchSprint: () => void;
+  sprintName?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory, onSwitchSprint 
+  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory, onSwitchSprint, sprintName 
 }) => {
   return (
     <div 
@@ -29,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!collapsed && (
           <div className="ml-3 overflow-hidden whitespace-nowrap animate-in fade-in duration-200">
             <h1 className="text-sm font-semibold text-[#172B4D] truncate leading-tight">Retro14</h1>
-            <p className="text-[11px] text-[#5E6C84] truncate mt-0.5">Sprint 24</p>
+            <p className="text-[11px] text-[#5E6C84] truncate mt-0.5">{sprintName || 'Current Sprint'}</p>
           </div>
         )}
       </div>

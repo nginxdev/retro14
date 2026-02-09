@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Hand, User as UserIcon, AlertTriangle, X } from 'lucide-react';
+import { Hand, AlertTriangle, X } from 'lucide-react';
 import { User } from '../types';
 
 interface UserFooterProps {
@@ -25,26 +25,31 @@ export const UserFooter: React.FC<UserFooterProps> = ({ currentUser, participant
 
   return (
     <>
-      <div className="relative h-16 bg-white border-t border-[#DFE1E6] flex items-center px-6 justify-between shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] z-30">
+      <div className="relative h-16 bg-white border-t border-[#DFE1E6] flex flex-wrap items-center px-4 justify-between gap-3 shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.02)] z-30">
         
-        <div className="flex items-center gap-4 overflow-x-auto no-scrollbar mask-gradient-right">
-             <span className="text-xs font-bold text-[#5E6C84] uppercase whitespace-nowrap">Participants ({participants.length})</span>
-             
+        <div className="flex-1 min-w-0 flex gap-2 items-center">
+           <div className="shrink-0">
+             <span className="text-[10px] font-bold text-[#5E6C84] uppercase whitespace-nowrap">Participants ({participants.length})</span>
+           </div>
+           <div className="flex-1 min-w-0 overflow-hidden">
+             <div className="flex flex-wrap gap-1 max-h-20 overflow-auto pr-1">
              {sortedParticipants.map(p => (
-                 <div 
-                   key={p.id} 
-                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${p.isHandRaised ? 'bg-[#EAE6FF] border-[#6554C0]' : 'bg-white border-[#DFE1E6]'} ${p.id === currentUser.id ? 'ring-2 ring-offset-1 ring-[#0052CC]/20' : ''}`}
-                 >
-                     <div 
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white font-bold"
-                        style={{ backgroundColor: p.color }}
-                     >
-                         {p.name.charAt(0)}
-                     </div>
-                     <span className={`text-sm font-medium ${p.isHandRaised ? 'text-[#403294]' : 'text-[#172B4D]'}`}>{p.name} {p.id === currentUser.id && '(You)'}</span>
-                     {p.isHandRaised && <Hand size={14} className="text-[#6554C0]" />}
+               <div 
+                 key={p.id} 
+                 className={`flex items-center gap-2 px-3 h-6 rounded-full border transition-all ${p.isHandRaised ? 'bg-[#EAE6FF] border-[#6554C0]' : 'bg-white border-[#DFE1E6]'} ${p.id === currentUser.id ? 'ring-2 ring-offset-1 ring-[#0052CC]/20' : ''}`}
+               >
+                  <div 
+                    className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] text-white font-bold"
+                    style={{ backgroundColor: p.color }}
+                  >
+                   {p.name.charAt(0)}
                  </div>
+                 <span className={`text-[11px] font-medium ${p.isHandRaised ? 'text-[#403294]' : 'text-[#172B4D]'}`}>{p.name} {p.id === currentUser.id && '(You)'}</span>
+                 {p.isHandRaised && <Hand size={14} className="text-[#6554C0]" />}
+               </div>
              ))}
+             </div>
+           </div>
         </div>
 
         <div className="pl-4 border-l border-[#DFE1E6] ml-4 flex items-center gap-2">

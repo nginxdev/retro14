@@ -11,9 +11,10 @@ interface ItemDetailModalProps {
   permissions: PermissionSettings;
   onClose: () => void;
   onUpdate: () => void;
+    sprintName?: string;
 }
 
-export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, currentUser, permissions, onClose, onUpdate }) => {
+export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, currentUser, permissions, onClose, onUpdate, sprintName }) => {
   const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -80,10 +81,10 @@ export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, current
              <div className="p-1.5 bg-[#0052CC] rounded-[3px] text-white text-xs font-bold">
                 RET
              </div>
-             <div className="flex flex-col">
-                 <span className="text-xs text-[#5E6C84] hover:underline cursor-pointer">RET-{item.id.substring(0,4).toUpperCase()}</span>
-                 <span className="text-xs text-[#5E6C84]">Sprint 24 Retrospective</span>
-             </div>
+                 <div className="flex flex-col">
+                     <span className="text-xs text-[#5E6C84] hover:underline cursor-pointer">RET-{item.id.substring(0,4).toUpperCase()}</span>
+                     <span className="text-xs text-[#5E6C84]">{sprintName ? `${sprintName} Retrospective` : 'Retro14 Retrospective'}</span>
+                 </div>
           </div>
           <div className="flex items-center gap-2">
             {/* Only show delete button if user owns the card or has permission */}

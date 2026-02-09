@@ -25,9 +25,10 @@ export interface RetroPageProps {
   sprintName?: string;
   sprintCode?: string;
   onSwitchSprint: () => void;
+    onSignOut: () => void;
 }
 
-export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName, sprintCode, onSwitchSprint }) => {
+export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName, sprintCode, onSwitchSprint, onSignOut }) => {
     const {
         columns, setColumns,
         items, selectedItem, setSelectedItem,
@@ -93,16 +94,17 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
 
   return (
     <div className="flex h-screen w-full bg-n10 overflow-hidden">
-      <Sidebar 
-        collapsed={sidebarCollapsed} 
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
-        currentUser={currentUser}
-        onEditProfile={() => setIsProfileOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenTeam={() => setIsTeamOpen(true)}
-        onOpenHistory={() => setIsHistoryOpen(true)}
-        onSwitchSprint={onSwitchSprint}
-      />
+            <Sidebar 
+                collapsed={sidebarCollapsed} 
+                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+                currentUser={currentUser}
+                onEditProfile={() => setIsProfileOpen(true)}
+                onOpenSettings={() => setIsSettingsOpen(true)}
+                onOpenTeam={() => setIsTeamOpen(true)}
+                onOpenHistory={() => setIsHistoryOpen(true)}
+                onSwitchSprint={onSwitchSprint}
+                sprintName={sprintName}
+            />
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="relative h-14 bg-white border-b border-n40 flex items-center justify-between px-6 shrink-0 z-30">
@@ -299,14 +301,19 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
         permissions={permissions}
         onClose={() => setSelectedItem(null)}
         onUpdate={refreshData}
+                sprintName={sprintName}
       />
       
       {isProfileOpen && (
-          <UserProfileDialog 
-            user={currentUser} 
-            onSave={handleUpdateProfile} 
-            onClose={() => setIsProfileOpen(false)} 
-          />
+            <UserProfileDialog 
+                        user={currentUser} 
+                        onSave={handleUpdateProfile} 
+                        onClose={() => setIsProfileOpen(false)} 
+                        onSignOut={() => {
+                            setIsProfileOpen(false);
+                            onSignOut();
+                        }}
+                    />
       )}
 
       {isSettingsOpen && (

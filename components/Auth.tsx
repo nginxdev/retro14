@@ -8,6 +8,8 @@ export const Auth: React.FC = () => {
   const [password, setPassword] = useState(''); // Only used for signUp/signIn with password
   const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+  const [magicSending, setMagicSending] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +35,42 @@ export const Auth: React.FC = () => {
       setMessage({ type: 'error', text: error.message || 'An error occurred during authentication.' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSendMagicLink = async () => {
+    if (!email) {
+      setMessage({ type: 'error', text: 'Provide an email to receive the magic link.' });
+      return;
+    }
+    setMagicSending(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase!.auth.signInWithOtp({ email });
+      if (error) throw error;
+      setMessage({ type: 'success', text: 'Check your inbox: a one-time link has been sent.' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Failed to send the magic link.' });
+    } finally {
+      setMagicSending(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setMessage({ type: 'error', text: 'Provide an email to receive a reset link.' });
+      return;
+    }
+    setResettingPassword(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase!.auth.resetPasswordForEmail(email);
+      if (error) throw error;
+      setMessage({ type: 'success', text: 'Reset instructions have been emailed to you.' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message || 'Failed to send the reset email.' });
+    } finally {
+      setResettingPassword(false);
     }
   };
 
@@ -114,6 +152,25 @@ export const Auth: React.FC = () => {
               )}
             </button>
           </form>
+
+          <div className="mt-4 flex flex-col gap-2 text-[11px] text-[#5E6C84]">
+            <button
+              type="button"
+              onClick={handlePasswordReset}
+              disabled={resettingPassword || !email}
+              className="w-full text-left text-[#0052CC] hover:text-[#0747A6] font-semibold"
+            >
+              {resettingPassword ? 'Sending reset link…' : 'Reset password'}
+            </button>
+            <button
+              type="button"
+              onClick={handleSendMagicLink}
+              disabled={magicSending || !email}
+              className="w-full text-left text-[#0052CC] hover:text-[#0747A6] font-semibold"
+            >
+              {magicSending ? 'Sending magic link…' : 'Send one-time login email'}
+            </button>
+          </div>
         </div>
         
         <div className="py-4 bg-n20 border-t border-n40 text-center">

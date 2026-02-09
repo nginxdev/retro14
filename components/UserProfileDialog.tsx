@@ -7,6 +7,7 @@ interface UserProfileDialogProps {
   user: User;
   onSave: (user: User) => void;
   onClose: () => void;
+  onSignOut: () => void;
 }
 
 const COLORS = [
@@ -20,7 +21,7 @@ const COLORS = [
   '#505F79', // Gray
 ];
 
-export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ user, onSave, onClose }) => {
+export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ user, onSave, onClose, onSignOut }) => {
   const [name, setName] = useState(user.name);
   const [role, setRole] = useState(user.role);
   const [color, setColor] = useState(user.color);
@@ -76,9 +77,17 @@ export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ user, onSa
           </div>
         </div>
 
-        <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
-          <button onClick={handleSave} className="px-3 py-1.5 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded">Save</button>
+        <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex flex-col gap-2">
+          <button
+            onClick={onSignOut}
+            className="w-full px-3 py-1.5 text-sm font-bold text-[#BF2600] bg-[#FFEBE6] border border-[#BF2600] rounded hover:bg-[#FFDAC7] transition-colors"
+          >
+            Log out
+          </button>
+          <div className="flex justify-end gap-2">
+            <button onClick={onClose} className="px-3 py-1.5 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
+            <button onClick={handleSave} className="px-3 py-1.5 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded">Save</button>
+          </div>
         </div>
       </div>
     </div>

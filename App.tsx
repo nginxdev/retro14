@@ -123,6 +123,12 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await supabase?.auth.signOut();
+    setCurrentSprint(null);
+    setDbUser(null);
+  };
+
   useEffect(() => {
     checkUrlForSprint();
 
@@ -249,6 +255,7 @@ const App: React.FC = () => {
       sprintName={currentSprint.name}
       sprintCode={currentSprint.code}
       onSwitchSprint={() => setIsSwitchingSprint(true)}
+      onSignOut={handleSignOut}
     />
   );
 };
