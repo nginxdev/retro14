@@ -117,13 +117,13 @@ export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, current
                     <div className="flex gap-3 justify-center">
                         <button 
                             onClick={() => setShowDeleteConfirm(false)}
-                            className="px-4 py-2 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded-[3px] transition-colors"
+                            className="px-3 py-1 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded-[3px] transition-colors"
                         >
                             Cancel
                         </button>
                         <button 
                             onClick={handleConfirmDelete}
-                            className="px-4 py-2 text-sm font-bold text-white bg-[#DE350B] hover:bg-[#BF2600] rounded-[3px] shadow-sm transition-colors"
+                            className="px-3 py-1 text-xs font-bold text-white bg-[#DE350B] hover:bg-[#BF2600] rounded-[3px] shadow-sm transition-colors"
                         >
                             Delete
                         </button>
@@ -151,7 +151,7 @@ export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, current
                         <button 
                             onClick={handleSaveContent}
                             disabled={content === item.content || isSaving}
-                            className="px-4 py-2 bg-[#0052CC] text-white text-sm font-bold rounded-[3px] hover:bg-[#0747A6] disabled:opacity-50 disabled:bg-[#EBECF0] disabled:text-[#A5ADBA] transition-colors"
+                            className="px-3 py-1 bg-[#0052CC] text-white text-xs font-bold rounded-[3px] hover:bg-[#0747A6] disabled:opacity-50 disabled:bg-[#EBECF0] disabled:text-[#A5ADBA] transition-colors"
                         >
                             {isSaving ? 'Saving...' : 'Save'}
                         </button>

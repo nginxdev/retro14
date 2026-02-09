@@ -48,7 +48,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({ onClose, sprintCode })
                 />
                 <button 
                     onClick={handleCopyLink}
-                    className="px-3 py-2 bg-[#F4F5F7] hover:bg-[#EBECF0] rounded text-[#42526E] font-medium text-sm flex items-center gap-2 transition-colors min-w-[90px] justify-center"
+                    className="px-2 py-1 bg-[#F4F5F7] hover:bg-[#EBECF0] rounded text-[#42526E] font-medium text-xs flex items-center gap-2 transition-colors min-w-[80px] justify-center"
                 >
                     {copiedLink ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
                     {copiedLink ? 'Copied' : 'Copy'}
@@ -63,7 +63,7 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({ onClose, sprintCode })
              </div>
              <button 
                 onClick={handleCopyCode}
-                className="h-10 w-10 bg-white rounded flex items-center justify-center text-[#403294] hover:bg-[#EBECF0] transition-colors border border-[#C0B6F2] relative"
+                className="h-8 w-8 bg-white rounded flex items-center justify-center text-[#403294] hover:bg-[#EBECF0] transition-colors border border-[#C0B6F2] relative"
                 title="Copy Board Code"
              >
                 {copiedCode ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}

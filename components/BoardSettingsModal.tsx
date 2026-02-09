@@ -255,8 +255,8 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({
         </div>
 
         <div className="p-5 border-t border-[#DFE1E6] flex justify-end gap-3 bg-white">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
-          <button onClick={handleSaveAll} className="px-4 py-2 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded shadow-sm">Save Changes</button>
+          <button onClick={onClose} className="px-3 py-1 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
+          <button onClick={handleSaveAll} className="px-3 py-1 text-xs font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded shadow-sm">Save Changes</button>
         </div>
       </div>
     </div>

@@ -98,9 +98,9 @@ const App: React.FC = () => {
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const possibleCode = pathParts[0];
 
-    if (possibleCode && /^[A-Z0-9-]{4,20}$/i.test(possibleCode)) {
-      const normalizedCode = possibleCode.toUpperCase();
-      const currentCode = currentSprint?.code?.toUpperCase();
+    if (possibleCode && /^[a-z0-9-]{4,20}$/i.test(possibleCode)) {
+      const normalizedCode = possibleCode.toLowerCase();
+      const currentCode = currentSprint?.code?.toLowerCase();
 
       if (!currentSprint || normalizedCode !== currentCode) {
         setUrlLoading(true);

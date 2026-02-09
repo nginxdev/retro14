@@ -104,6 +104,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                 onOpenHistory={() => setIsHistoryOpen(true)}
                 onSwitchSprint={onSwitchSprint}
                 sprintName={sprintName}
+                sprintCode={sprintCode}
             />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -136,7 +137,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                {!isVotingActive ? (
                    <button 
                        onClick={() => setIsVotingConfigOpen(true)}
-                       className="flex items-center gap-2 px-3 py-1.5 bg-n20 border border-n40 rounded-lg text-n800 hover:bg-n30 text-sm font-medium transition-colors"
+                       className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-n800 hover:bg-n30 text-xs font-medium transition-colors"
                    >
                        <Vote size={14} />
                        Start Vote
@@ -166,7 +167,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
              <div className="relative">
                  <button
                     onClick={() => setIsViewMenuOpen(!isViewMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-n20 border border-n40 rounded text-sm text-n500 hover:bg-n30 transition-colors"
+                    className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-xs text-n500 hover:bg-n30 transition-colors"
                  >
                      <Settings size={16} />
                      <span>View Options</span>
@@ -184,7 +185,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                                  onClick={() => {
                                      setViewConfig(prev => ({ ...prev, sortBy: prev.sortBy === 'author' ? 'none' : 'author' }));
                                  }}
-                                 className="w-full text-left px-3 py-2 text-sm text-n800 hover:bg-n20 flex items-center justify-between rounded"
+                                 className="w-full text-left px-2 py-1 text-xs text-n800 hover:bg-n20 flex items-center justify-between rounded"
                              >
                                  <div className="flex items-center gap-2">
                                      <ArrowDownAZ size={14} className="text-n300" />
@@ -196,7 +197,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                                  onClick={() => {
                                      setViewConfig(prev => ({ ...prev, groupBy: prev.groupBy === 'author' ? 'none' : 'author' }));
                                  }}
-                                 className="w-full text-left px-3 py-2 text-sm text-n800 hover:bg-n20 flex items-center justify-between rounded"
+                                 className="w-full text-left px-2 py-1 text-xs text-n800 hover:bg-n20 flex items-center justify-between rounded"
                              >
                                  <div className="flex items-center gap-2">
                                      <Layers size={14} className="text-n300" />
@@ -214,7 +215,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                                      <button
                                          key={c.id}
                                          onClick={() => handleToggleColumnVisibility(c.id)}
-                                         className="w-full text-left px-3 py-2 text-sm text-n800 hover:bg-n30 flex items-center justify-between group rounded"
+                                         className="w-full text-left px-2 py-1 text-xs text-n800 hover:bg-n30 flex items-center justify-between group rounded"
                                      >
                                          <span className="truncate">{c.title}</span>
                                          {hiddenColumnIds.has(c.id) ? (
@@ -232,7 +233,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
 
              <button 
                 onClick={() => setIsExportOpen(true)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-n20 border border-n40 rounded text-sm text-n800 hover:bg-n30 transition-colors"
+                className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-xs text-n800 hover:bg-n30 transition-colors"
              >
                 <Download size={16} />
                 <span>Export</span>
@@ -240,7 +241,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
 
              <button 
                 onClick={() => setIsShareOpen(true)}
-                className="bg-b400 text-white px-3 py-1.5 rounded font-bold text-sm hover:bg-b500 flex items-center transition-colors"
+                className="bg-b400 text-white px-2 py-1 rounded font-bold text-xs hover:bg-b500 flex items-center transition-colors"
              >
                 <Share2 size={16} className="mr-2" />
                 Share
@@ -402,7 +403,7 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
                     <p className="text-sm text-n800">This will conclude the voting session. Cards with votes will be <strong>copied</strong> to a new <strong>"Voting Results"</strong> column.</p>
                 </div>
                 <div className="p-4 border-t border-n40 bg-n10 flex justify-end gap-2">
-                    <button onClick={() => setIsEndVotingConfirmOpen(false)} className="px-3 py-1.5 text-sm font-medium text-n500 hover:bg-n30 rounded">Cancel</button>
+                    <button onClick={() => setIsEndVotingConfirmOpen(false)} className="px-2 py-1 text-xs font-medium text-n500 hover:bg-n30 rounded">Cancel</button>
                     <button 
                         onClick={confirmEndVoting} 
                         className="px-3 py-1.5 text-sm font-bold text-white bg-b400 hover:bg-b500 rounded"

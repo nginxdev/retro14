@@ -69,7 +69,7 @@ export const ColumnSettingsDialog: React.FC<ColumnSettingsDialogProps> = ({ colu
         </div>
 
         <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex justify-end gap-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
+          <button onClick={onClose} className="px-2 py-1 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
           <button onClick={handleSave} className="px-3 py-1.5 text-sm font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded">Save</button>
         </div>
       </div>

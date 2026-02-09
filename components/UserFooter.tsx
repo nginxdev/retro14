@@ -61,7 +61,7 @@ export const UserFooter: React.FC<UserFooterProps> = ({ currentUser, participant
             </button>
             <button 
                 onClick={onRaiseHand}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all transform active:scale-95 ${currentUser.isHandRaised ? 'bg-[#FF5630] text-white hover:bg-[#DE350B]' : 'bg-[#0052CC] text-white hover:bg-[#0747A6]'}`}
+                className={`flex items-center gap-2 px-3 py-1 rounded font-bold text-xs transition-all transform active:scale-95 ${currentUser.isHandRaised ? 'bg-[#FF5630] text-white hover:bg-[#DE350B]' : 'bg-[#0052CC] text-white hover:bg-[#0747A6]'}`}
             >
                 <Hand size={16} className={currentUser.isHandRaised ? "animate-pulse" : ""} />
                 {currentUser.isHandRaised ? "Lower Hand" : "Raise Hand"}
@@ -83,10 +83,10 @@ export const UserFooter: React.FC<UserFooterProps> = ({ currentUser, participant
                     <p className="text-sm text-[#172B4D]">This will lower the hands of all participants. Are you sure you want to proceed?</p>
                 </div>
                 <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex justify-end gap-2">
-                    <button onClick={() => setIsConfirmOpen(false)} className="px-3 py-1.5 text-sm font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
+                    <button onClick={() => setIsConfirmOpen(false)} className="px-2 py-1 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
                     <button 
                         onClick={() => { onLowerAllHands(); setIsConfirmOpen(false); }} 
-                        className="px-3 py-1.5 text-sm font-bold text-white bg-[#FF5630] hover:bg-[#DE350B] rounded"
+                        className="px-2 py-1 text-xs font-bold text-white bg-[#FF5630] hover:bg-[#DE350B] rounded"
                     >
                         Lower All
                     </button>

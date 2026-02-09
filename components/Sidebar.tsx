@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { KanbanSquare, Settings, ChevronLeft, ChevronRight, Users, History, Layout } from 'lucide-react';
+import { KanbanSquare, Settings, ChevronLeft, ChevronRight, Users, History, Layout, Copy, Check } from 'lucide-react';
 import { User } from '../types';
 
 interface SidebarProps {
@@ -13,11 +13,22 @@ interface SidebarProps {
   onOpenHistory: () => void;
   onSwitchSprint: () => void;
   sprintName?: string;
+  sprintCode?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory, onSwitchSprint, sprintName 
+  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory, onSwitchSprint, sprintName, sprintCode
 }) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopyCode = () => {
+    if (sprintCode) {
+      navigator.clipboard.writeText(sprintCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
   return (
     <div 
       className={`relative flex flex-col h-full bg-[#F4F5F7] border-r border-[#DFE1E6] transition-all duration-300 z-40 group/sidebar ${collapsed ? 'w-[60px]' : 'w-[240px]'}`}
@@ -96,7 +107,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Bottom User Profile Section */}
-      <div className="p-3 border-t border-[#DFE1E6]">
+      <div className="p-3 border-t border-[#DFE1E6] space-y-3">
+        {/* Board Code */}
+        {sprintCode && !collapsed && (
+          <div className="flex items-center justify-between gap-2 px-3 py-2 bg-white rounded-[3px] border border-[#DFE1E6] hover:border-[#0052CC] transition-colors group">
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-bold text-[#5E6C84] uppercase tracking-wide mb-0.5">Board Code</p>
+              <p className="text-sm font-mono font-bold text-[#0052CC] truncate">{sprintCode}</p>
+            </div>
+            <button
+              onClick={handleCopyCode}
+              className="p-1 text-[#5E6C84] hover:text-[#0052CC] hover:bg-[#DEEBFF] rounded transition-colors shrink-0"
+              title="Copy board code"
+            >
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+            </button>
+          </div>
+        )}
+
+        {/* User Profile */}
         <div 
           className="flex items-center cursor-pointer hover:bg-[#EBECF0] p-2 rounded-[3px] transition-colors group relative"
           onClick={onEditProfile}

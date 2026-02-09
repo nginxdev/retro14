@@ -16,7 +16,7 @@ let mockData: RetroItem[] = [];
 
 // Helper to generate sprint code
 const generateSprintCode = () => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars = "23456789abcdefghjkmnpqrstuvwxyz";
   const part = () =>
     Array.from(
       { length: 4 },
@@ -57,12 +57,12 @@ export const dataService = {
     code: string,
   ): Promise<{ id: string; name: string; code: string } | null> {
     if (isSupabaseConfigured && supabase) {
-      const upperCode = code.toUpperCase();
-      console.log("Attempting to join sprint with code:", upperCode);
+      const lowerCode = code.toLowerCase();
+      console.log("Attempting to join sprint with code:", lowerCode);
       const { data, error } = await supabase
         .from("sprints")
         .select("id, name, code")
-        .ilike("code", upperCode)
+        .ilike("code", lowerCode)
         .single();
 
       if (error || !data) {
