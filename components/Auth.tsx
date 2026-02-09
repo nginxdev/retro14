@@ -131,7 +131,10 @@ export const Auth: React.FC = () => {
 
         <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-b400 rounded-[3px] flex items-center justify-center font-bold text-white">R</div>
+                <picture>
+                  <source srcSet="/logo-auth.svg" type="image/svg+xml" />
+                  <img src="/logo-auth-40.png" alt="Retro14" className="w-8 h-8" />
+                </picture>
                 <span className="font-bold text-xl tracking-tight">Retro14</span>
             </div>
         </div>
@@ -187,7 +190,10 @@ export const Auth: React.FC = () => {
           <div className="w-full max-w-md bg-white p-8 rounded-[3px] shadow-sm border border-n40">
             {/* Mobile Header (only visible on small screens) */}
             <div className="lg:hidden text-center mb-8">
-                 <div className="w-10 h-10 bg-b400 rounded-[3px] flex items-center justify-center mx-auto mb-2 text-white font-bold">R</div>
+                 <picture>
+                   <source srcSet="/logo-auth.svg" type="image/svg+xml" />
+                   <img src="/logo-auth-40.png" alt="Retro14" className="w-10 h-10 mx-auto mb-2" />
+                 </picture>
                  <h2 className="text-xl font-bold text-n800">Retro14</h2>
             </div>
 

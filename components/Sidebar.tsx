@@ -35,9 +35,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       {/* Project Info Header */}
       <div className={`flex items-center h-16 px-4 mb-2 transition-opacity ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 bg-[#0052CC] rounded-[3px] flex items-center justify-center shrink-0 shadow-sm text-white font-bold tracking-tight">
-          R
-        </div>
+        <img 
+          src="/logo-192.png" 
+          alt="Retro14 Logo" 
+          className="w-8 h-8 rounded-[3px] shrink-0 shadow-sm"
+        />
         {!collapsed && (
           <div className="ml-3 overflow-hidden whitespace-nowrap animate-in fade-in duration-200">
             <h1 className="text-sm font-semibold text-[#172B4D] truncate leading-tight">Retro14</h1>
