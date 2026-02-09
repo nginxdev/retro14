@@ -1,4 +1,3 @@
-
 export interface Comment {
   id: string;
   text: string;
@@ -33,20 +32,22 @@ export interface RetroItem {
   votes: Record<string, number>; // userId -> count
   actionItems: ActionItem[];
   is_staged?: boolean;
+  user_id?: string;
   parent_id?: string | null; // For grouping items
-  type?: 'card' | 'group';
+  type?: "card" | "group";
+  sprint_id?: string;
 }
 
 export interface Column {
   id: string;
   title: string;
-  colorTheme: 'green' | 'red' | 'blue' | 'yellow' | 'purple' | 'gray';
-  viewMode?: 'board' | 'action-list';
+  colorTheme: "green" | "red" | "blue" | "yellow" | "purple" | "gray";
+  viewMode?: "board" | "action-list";
 }
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'model';
+  role: "user" | "model";
   text: string;
   timestamp: number;
 }
@@ -64,4 +65,29 @@ export interface VotingConfig {
   votesPerParticipant: number;
   anonymous: boolean;
   allowMultiplePerCard: boolean;
+}
+
+export interface PermissionSettings {
+  canMoveOthersCards: boolean;
+  canEditOthersCards: boolean;
+  canDeleteOthersCards: boolean;
+}
+
+export type TimerStatus = "running" | "paused" | "stopped";
+
+export interface TimerConfig {
+  endTime: string | null; // ISO timestamp
+  duration: number; // Duration in seconds
+  status: TimerStatus;
+  remainingAtPause?: number; // Seconds left when paused
+}
+
+export interface SprintConfig {
+  columns: Column[];
+  votingConfig?: VotingConfig;
+  permissions?: PermissionSettings;
+  settings?: {
+    isCardOverviewEnabled: boolean;
+  };
+  timer?: TimerConfig;
 }

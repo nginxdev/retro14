@@ -4,17 +4,25 @@ import { X, Copy, Check, Link } from 'lucide-react';
 
 interface ShareDialogProps {
   onClose: () => void;
+  sprintCode: string;
 }
 
-export const ShareDialog: React.FC<ShareDialogProps> = ({ onClose }) => {
-  const [copied, setCopied] = useState(false);
-  const currentUrl = window.location.href;
-  const boardCode = "R14-24-X9Z"; // Branding updated
+export const ShareDialog: React.FC<ShareDialogProps> = ({ onClose, sprintCode }) => {
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const shareUrl = `${window.location.origin}/${sprintCode}`;
+  const boardCode = sprintCode;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(currentUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(shareUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(boardCode);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
@@ -35,27 +43,34 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({ onClose }) => {
                 <input 
                     type="text" 
                     readOnly
-                    value={currentUrl}
+                    value={shareUrl}
                     className="flex-1 border border-[#DFE1E6] rounded p-2 text-sm text-[#172B4D] bg-[#FAFBFC] focus:outline-none"
                 />
                 <button 
-                    onClick={handleCopy}
+                    onClick={handleCopyLink}
                     className="px-3 py-2 bg-[#F4F5F7] hover:bg-[#EBECF0] rounded text-[#42526E] font-medium text-sm flex items-center gap-2 transition-colors min-w-[90px] justify-center"
                 >
-                    {copied ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
-                    {copied ? 'Copied' : 'Copy'}
+                    {copiedLink ? <Check size={16} className="text-green-600" /> : <Copy size={16} />}
+                    {copiedLink ? 'Copied' : 'Copy'}
                 </button>
             </div>
           </div>
           
           <div className="p-4 bg-[#EAE6FF] rounded-lg border border-[#C0B6F2] flex justify-between items-center">
-             <div>
+             <div className="flex-1">
                 <span className="block text-xs font-bold text-[#403294] uppercase mb-0.5">Board Code</span>
                 <span className="text-lg font-mono font-bold text-[#403294] tracking-wider">{boardCode}</span>
              </div>
-             <div className="h-10 w-10 bg-white rounded flex items-center justify-center text-[#403294] font-bold text-xl">
-                R
-             </div>
+             <button 
+                onClick={handleCopyCode}
+                className="h-10 w-10 bg-white rounded flex items-center justify-center text-[#403294] hover:bg-[#EBECF0] transition-colors border border-[#C0B6F2] relative"
+                title="Copy Board Code"
+             >
+                {copiedCode ? <Check size={18} className="text-green-600" /> : <Copy size={18} />}
+                {copiedCode && (
+                    <span className="absolute -top-8 bg-[#403294] text-white text-[10px] py-1 px-2 rounded whitespace-nowrap">Copied!</span>
+                )}
+             </button>
           </div>
         </div>
       </div>

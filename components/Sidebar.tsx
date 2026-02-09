@@ -11,10 +11,11 @@ interface SidebarProps {
   onOpenSettings: () => void;
   onOpenTeam: () => void;
   onOpenHistory: () => void;
+  onSwitchSprint: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory 
+  collapsed, onToggle, currentUser, onEditProfile, onOpenSettings, onOpenTeam, onOpenHistory, onSwitchSprint 
 }) => {
   return (
     <div 
@@ -71,6 +72,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label="Board Settings" 
             collapsed={collapsed} 
             onClick={onOpenSettings} 
+        />
+
+        <div className="my-2 border-t border-[#DFE1E6] mx-3"></div>
+
+        <NavItem 
+            icon={<Layout size={20} />} 
+            label="Switch Sprint" 
+            collapsed={collapsed} 
+            onClick={onSwitchSprint} 
         />
       </nav>
 

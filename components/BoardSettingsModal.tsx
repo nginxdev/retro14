@@ -1,21 +1,27 @@
-
 import React, { useState } from 'react';
-import { X, Plus, Trash2, GripVertical, CreditCard } from 'lucide-react';
-import { Column } from '../types';
+import { X, Plus, Trash2, GripVertical, CreditCard, Shield } from 'lucide-react';
+import { Column, PermissionSettings } from '../types';
 
 interface BoardSettingsModalProps {
   columns: Column[];
   isCardOverviewEnabled: boolean;
-  onToggleCardOverview: (enabled: boolean) => void;
-  onSave: (columns: Column[]) => void;
+  permissions: PermissionSettings;
+  onSave: (columns: Column[], permissions: PermissionSettings, isCardOverviewEnabled: boolean) => void;
   onClose: () => void;
 }
 
 const THEMES = ['green', 'red', 'blue', 'yellow', 'purple', 'gray'] as const;
 
-export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns, isCardOverviewEnabled, onToggleCardOverview, onSave, onClose }) => {
+export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ 
+  columns, 
+  isCardOverviewEnabled, 
+  permissions,
+  onSave, 
+  onClose 
+}) => {
   const [editedColumns, setEditedColumns] = useState<Column[]>([...columns]);
   const [cardOverviewEnabled, setCardOverviewEnabled] = useState(isCardOverviewEnabled);
+  const [editedPermissions, setEditedPermissions] = useState<PermissionSettings>(permissions);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const handleTitleChange = (id: string, newTitle: string) => {
@@ -44,8 +50,7 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns,
   };
 
   const handleSaveAll = () => {
-    onSave(editedColumns);
-    onToggleCardOverview(cardOverviewEnabled);
+    onSave(editedColumns, editedPermissions, cardOverviewEnabled);
     onClose();
   };
 
@@ -109,6 +114,76 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({ columns,
                                 className="sr-only peer" 
                                 checked={cardOverviewEnabled}
                                 onChange={(e) => setCardOverviewEnabled(e.target.checked)}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0052CC]"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            {/* Permissions Section */}
+            <div className="space-y-3">
+                <h3 className="text-xs font-bold text-[#5E6C84] uppercase tracking-wide">Card Permissions</h3>
+                <div className="bg-white p-4 rounded border border-[#DFE1E6] shadow-sm space-y-4">
+                    
+                    <label className="flex items-center justify-between cursor-pointer group">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#E3FCEF] text-[#00875A] rounded">
+                                <Shield size={20} />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-medium text-[#172B4D]">Move Others' Cards</span>
+                                <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to move cards created by others</span>
+                            </div>
+                        </div>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only peer" 
+                                checked={editedPermissions.canMoveOthersCards}
+                                onChange={(e) => setEditedPermissions(prev => ({ ...prev, canMoveOthersCards: e.target.checked }))}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0052CC]"></div>
+                        </div>
+                    </label>
+
+                    <label className="flex items-center justify-between cursor-pointer group">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#DEEBFF] text-[#0052CC] rounded">
+                                <Shield size={20} />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-medium text-[#172B4D]">Edit Others' Cards</span>
+                                <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to edit content of cards created by others</span>
+                            </div>
+                        </div>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only peer" 
+                                checked={editedPermissions.canEditOthersCards}
+                                onChange={(e) => setEditedPermissions(prev => ({ ...prev, canEditOthersCards: e.target.checked }))}
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0052CC]"></div>
+                        </div>
+                    </label>
+
+                    <label className="flex items-center justify-between cursor-pointer group">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#FFEBE6] text-[#DE350B] rounded">
+                                <Shield size={20} />
+                            </div>
+                            <div>
+                                <span className="block text-sm font-medium text-[#172B4D]">Delete Others' Cards</span>
+                                <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to delete cards created by others</span>
+                            </div>
+                        </div>
+                        <div className="relative inline-flex items-center cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only peer" 
+                                checked={editedPermissions.canDeleteOthersCards}
+                                onChange={(e) => setEditedPermissions(prev => ({ ...prev, canDeleteOthersCards: e.target.checked }))}
                             />
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0052CC]"></div>
                         </div>

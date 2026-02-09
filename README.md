@@ -13,13 +13,11 @@
 - **Grouping:** Drag and drop cards to group related thoughts.
 - **Action Items:** Track follow-up tasks directly within the board.
 - **Atlassian-inspired UI:** Clean, accessible, and familiar design system tokens.
-- **AI Assistant:** Integrated assistant to help grouped themes and analyze sentiment (powered by Gemini).
 
 ## Tech Stack
 
 - **Frontend:** React, TypeScript, Tailwind CSS
 - **Icons:** Lucide React
-- **AI:** Google Gemini API
 - **Backend:** Supabase (Optional/Configurable)
 
 ## Getting Started
@@ -29,7 +27,7 @@
    ```bash
    npm install
    ```
-3. Set up your environment variables (API keys for Gemini/Supabase).
+3. Configure any required environment variables (e.g., Supabase credentials).
 4. Run the development server:
    ```bash
    npm run dev

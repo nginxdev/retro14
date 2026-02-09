@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Board } from '../components/Board';
 import { IssueDetailModal } from '../components/IssueDetailModal';
-import { Assistant } from '../components/Assistant';
 import { UserProfileDialog } from '../components/UserProfileDialog';
 import { BoardSettingsModal } from '../components/BoardSettingsModal';
 import { ColumnSettingsDialog } from '../components/ColumnSettingsDialog';
@@ -13,15 +12,28 @@ import { Timer } from '../components/Timer';
 import { UserFooter } from '../components/UserFooter';
 import { TeamModal } from '../components/TeamModal';
 import { HistoryModal } from '../components/HistoryModal';
-import { Share2, Vote, X, AlertTriangle, Eye, ChevronDown, Settings, Layers, ArrowDownAZ, EyeOff, Check } from 'lucide-react';
+import { Share2, Vote, X, AlertTriangle, Eye, ChevronDown, Settings, Layers, ArrowDownAZ, EyeOff, Check, Download } from 'lucide-react';
+import { ExportModal } from '../components/ExportModal';
 import { useRetroBoard } from '../hooks/useRetroBoard';
+import { dataService } from '../services/dataService';
 
-export const RetroPage: React.FC = () => {
+import { User } from '../types';
+
+export interface RetroPageProps {
+  user?: User;
+  sprintId: string;
+  sprintName?: string;
+  sprintCode?: string;
+  onSwitchSprint: () => void;
+}
+
+export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName, sprintCode, onSwitchSprint }) => {
     const {
         columns, setColumns,
         items, selectedItem, setSelectedItem,
         currentUser, setCurrentUser,
         participants,
+        // ...
         isVotingConfigOpen, setIsVotingConfigOpen,
         isVotingActive,
         votingConfig,
@@ -35,6 +47,7 @@ export const RetroPage: React.FC = () => {
         hiddenColumnIds,
         viewConfig, setViewConfig,
         isCardOverviewEnabled, setIsCardOverviewEnabled,
+        permissions, setPermissions,
         isLoading,
         refreshData,
         handleStartVoting,
@@ -53,12 +66,20 @@ export const RetroPage: React.FC = () => {
         handleLowerAllHands,
         handleUpdateProfile,
         handleColumnUpdate,
-        handleToggleColumnVisibility
-    } = useRetroBoard();
+        handleToggleColumnVisibility,
+        handleDeleteItem,
+        handleStartTimer,
+        handlePauseTimer,
+        handleResumeTimer,
+        handleResetTimer,
+        timer,
+        remainingTime
+    } = useRetroBoard(user, sprintId);
 
     const [isViewMenuOpen, setIsViewMenuOpen] = useState(false);
     const [isTeamOpen, setIsTeamOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [isExportOpen, setIsExportOpen] = useState(false);
 
     // Sort: Hand raised first (by time), then others
     const sortedParticipants = [...participants].sort((a, b) => {
@@ -80,6 +101,7 @@ export const RetroPage: React.FC = () => {
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenTeam={() => setIsTeamOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
+        onSwitchSprint={onSwitchSprint}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
@@ -89,7 +111,7 @@ export const RetroPage: React.FC = () => {
              <div className="text-sm breadcrumbs text-n300 flex items-center gap-2">
                <span className="font-semibold text-n500 hover:text-b400 cursor-pointer">Retro14</span>
                <span className="text-n300">/</span>
-               <span className="font-semibold text-n800">Sprint 24</span>
+               <span className="font-semibold text-n800">{sprintName || 'Current Sprint'}</span>
                <div className="h-4 w-px bg-n40 mx-2"></div>
                <div className="flex items-center gap-1 text-xs bg-g50 text-g400 px-2 py-0.5 rounded-full font-medium">
                   <span className="w-1.5 h-1.5 bg-g200 rounded-full animate-pulse"></span>
@@ -100,7 +122,14 @@ export const RetroPage: React.FC = () => {
            
            {/* Center Controls (Timer & Voting) */}
            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
-               <Timer />
+                <Timer 
+                  timer={timer}
+                  remainingTime={remainingTime}
+                  onStart={handleStartTimer}
+                  onPause={handlePauseTimer}
+                  onResume={handleResumeTimer}
+                  onReset={handleResetTimer}
+                />
                
                {!isVotingActive ? (
                    <button 
@@ -200,6 +229,14 @@ export const RetroPage: React.FC = () => {
              </div>
 
              <button 
+                onClick={() => setIsExportOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-n20 border border-n40 rounded text-sm text-n800 hover:bg-n30 transition-colors"
+             >
+                <Download size={16} />
+                <span>Export</span>
+             </button>
+
+             <button 
                 onClick={() => setIsShareOpen(true)}
                 className="bg-b400 text-white px-3 py-1.5 rounded font-bold text-sm hover:bg-b500 flex items-center transition-colors"
              >
@@ -235,6 +272,8 @@ export const RetroPage: React.FC = () => {
                     onToggleActionItem={handleToggleActionItem}
                     onAddComment={handleAddComment}
                     onUpdateItemContent={handleUpdateItemContent}
+                    onDelete={handleDeleteItem}
+                    permissions={permissions}
                     
                     hiddenColumnIds={hiddenColumnIds}
                     onToggleColumnVisibility={handleToggleColumnVisibility}
@@ -257,6 +296,7 @@ export const RetroPage: React.FC = () => {
       <IssueDetailModal 
         item={selectedItem} 
         currentUser={currentUser}
+        permissions={permissions}
         onClose={() => setSelectedItem(null)}
         onUpdate={refreshData}
       />
@@ -273,8 +313,21 @@ export const RetroPage: React.FC = () => {
           <BoardSettingsModal 
             columns={columns}
             isCardOverviewEnabled={isCardOverviewEnabled}
-            onToggleCardOverview={setIsCardOverviewEnabled}
-            onSave={setColumns}
+            permissions={permissions}
+            onSave={(newColumns, newPermissions, cardOverview) => {
+              setColumns(newColumns);
+              setPermissions(newPermissions);
+              setIsCardOverviewEnabled(cardOverview);
+              
+              dataService.updateSprintConfig(sprintId, {
+                columns: newColumns,
+                votingConfig,
+                permissions: newPermissions,
+                settings: {
+                  isCardOverviewEnabled: cardOverview
+                }
+              });
+            }}
             onClose={() => setIsSettingsOpen(false)}
           />
       )}
@@ -287,11 +340,30 @@ export const RetroPage: React.FC = () => {
       )}
 
       {isHistoryOpen && (
-          <HistoryModal onClose={() => setIsHistoryOpen(false)} />
+          <HistoryModal 
+            userId={currentUser.id}
+            currentSprintId={sprintId}
+            currentSprintName={sprintName}
+            currentSprintCode={sprintCode}
+            onClose={() => setIsHistoryOpen(false)} 
+            onSelectSprint={(code) => {
+                window.location.pathname = `/${code}`;
+            }}
+          />
       )}
 
       {isShareOpen && (
-          <ShareDialog onClose={() => setIsShareOpen(false)} />
+          <ShareDialog onClose={() => setIsShareOpen(false)} sprintCode={sprintCode || ''} />
+      )}
+
+      {isExportOpen && (
+          <ExportModal 
+            sprintName={sprintName || 'Current Sprint'}
+            participants={participants}
+            columns={columns}
+            items={items}
+            onClose={() => setIsExportOpen(false)}
+          />
       )}
 
       {editingColumnId && (
@@ -335,7 +407,6 @@ export const RetroPage: React.FC = () => {
         </div>
       )}
 
-      <Assistant />
     </div>
   );
 };

@@ -20,20 +20,27 @@ export const VoteControl: React.FC<VoteControlProps> = ({ itemId, votes, allVote
 
      if (isVotingActive) {
          const isMaxed = userVotesUsed >= (votingConfig?.votesPerParticipant || 6);
+         const isSingleVoted = !votingConfig?.allowMultiplePerCard && votes >= 1;
+         const canAdd = !isMaxed && !isSingleVoted;
 
          return (
-             <div className="flex items-center gap-1 bg-[#F4F5F7] hover:bg-[#EBECF0] rounded-full px-1.5 py-0.5 border border-[#DFE1E6] transition-colors">
+             <div className="flex items-center gap-1 bg-[#F4F5F7] hover:bg-[#EBECF0] rounded-full px-1.5 py-0.5 border border-[#DFE1E6] transition-colors shadow-sm">
                 <button 
-                    onClick={(e) => { e.stopPropagation(); onVote(itemId, 1); }}
-                    disabled={isMaxed}
-                    className={`flex items-center justify-center w-5 h-5 rounded-full hover:bg-white transition-colors ${votes > 0 ? 'text-[#0052CC]' : 'text-[#5E6C84]'}`}
-                    title="Vote"
+                    onClick={(e) => { e.stopPropagation(); if (canAdd) onVote(itemId, 1); }}
+                    disabled={!canAdd}
+                    className={`flex items-center justify-center w-5 h-5 rounded-full hover:bg-white transition-colors ${votes > 0 ? 'text-[#0052CC]' : 'text-[#5E6C84]'} ${!canAdd ? 'opacity-30 cursor-not-allowed' : ''}`}
+                    title={isMaxed ? "No votes left" : isSingleVoted ? "Already voted" : "Vote"}
                 >
                     <ThumbsUp size={12} className={votes > 0 ? "fill-current" : ""} />
                 </button>
                 
                 {votes > 0 && (
-                    <span className="text-[10px] font-bold text-[#0052CC] min-w-[8px] text-center">{votes}</span>
+                    <span className="text-[10px] font-bold text-[#0052CC] min-w-[8px] text-center" title="Your votes">{votes}</span>
+                )}
+
+                {/* Show total votes only if not anonymous OR if it's the current user's count */}
+                {!votingConfig?.anonymous && totalVotes > 0 && totalVotes !== votes && (
+                    <span className="text-[10px] font-medium text-[#5E6C84] border-l border-n40 pl-1 ml-0.5" title="Total votes">{totalVotes}</span>
                 )}
                 
                 {votes > 0 && (
@@ -51,7 +58,7 @@ export const VoteControl: React.FC<VoteControlProps> = ({ itemId, votes, allVote
 
      // Voting ended, show results
      return (
-         <div className="flex items-center gap-1 bg-[#E3FCEF] border border-[#ABF5D1] rounded-full px-1.5 py-0.5">
+         <div className="flex items-center gap-1 bg-[#E3FCEF] border border-[#ABF5D1] rounded-full px-1.5 py-0.5 shadow-sm">
              <ThumbsUp size={10} className="text-[#006644] fill-current" />
              <span className="text-[10px] font-bold text-[#006644]">{totalVotes}</span>
          </div>

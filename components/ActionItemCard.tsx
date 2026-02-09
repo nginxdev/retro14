@@ -10,9 +10,19 @@ interface ActionItemCardProps {
     onAddActionItem: (itemId: string, text: string) => void;
     onToggleActionItem: (itemId: string, actionId: string) => void;
     onAddComment: (itemId: string, text: string) => void;
+    onReaction: (itemId: string, emoji: string) => void;
+    dragHandlers: {
+        handleDragStart: (e: React.DragEvent, itemId: string) => void;
+        handleDragOver: (e: React.DragEvent) => void;
+        handleCardDragEnter: (e: React.DragEvent, targetItemId: string) => void;
+        handleCardDrop: (e: React.DragEvent, targetItemId: string) => void;
+        setDragOverTargetId: (id: string | null) => void;
+    };
 }
 
-export const ActionItemCard: React.FC<ActionItemCardProps> = ({ item, childrenItems, currentUser, onAddActionItem, onToggleActionItem, onAddComment }) => {
+export const ActionItemCard: React.FC<ActionItemCardProps> = ({ 
+    item, childrenItems, currentUser, onAddActionItem, onToggleActionItem, onAddComment, onReaction, dragHandlers 
+}) => {
     const [newActionText, setNewActionText] = useState('');
     const [newCommentText, setNewCommentText] = useState('');
     const [showComments, setShowComments] = useState(false);
@@ -32,7 +42,15 @@ export const ActionItemCard: React.FC<ActionItemCardProps> = ({ item, childrenIt
     };
 
     return (
-        <div className="w-full bg-white border border-[#DFE1E6] rounded-lg shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2">
+        <div 
+            draggable
+            onDragStart={(e) => dragHandlers.handleDragStart(e, item.id)}
+            onDragOver={dragHandlers.handleDragOver}
+            onDragEnter={(e) => dragHandlers.handleCardDragEnter(e, item.id)}
+            onDragLeave={() => dragHandlers.setDragOverTargetId(null)}
+            onDrop={(e) => dragHandlers.handleCardDrop(e, item.id)}
+            className="w-full bg-white border border-[#DFE1E6] rounded-lg shadow-sm p-4 flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing"
+        >
             {/* Header Row: Content + Stats */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -114,38 +132,77 @@ export const ActionItemCard: React.FC<ActionItemCardProps> = ({ item, childrenIt
                 </div>
             </div>
 
-            {/* Comments Toggle */}
-            <div className="border-t border-[#DFE1E6] pt-2 flex flex-col gap-2">
-                <button 
-                    onClick={() => setShowComments(!showComments)}
-                    className="flex items-center gap-1.5 text-xs font-medium text-[#5E6C84] hover:text-[#172B4D] self-start"
-                >
-                    <MessageSquare size={14} />
-                    {item.comments.length} Comments
-                </button>
+            {/* Footer Row: Author Avatar & Reactions */}
+            <div className="flex items-center justify-between border-t border-[#DFE1E6] pt-3 mt-auto">
+                <div className="flex items-center gap-2">
+                    <button 
+                        onClick={() => setShowComments(!showComments)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-[#5E6C84] hover:text-[#172B4D]"
+                    >
+                        <MessageSquare size={14} />
+                        {item.comments.length}
+                    </button>
+                    
+                    <div className="flex flex-wrap items-center gap-1 ml-2">
+                        {item.reactions.map(r => (
+                            <button
+                                key={r.emoji}
+                                onClick={() => onReaction(item.id, r.emoji)}
+                                className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] border transition-colors ${r.authors.includes(currentUser.id) ? 'bg-b50 border-b100 text-b500' : 'bg-white border-[#DFE1E6] hover:bg-[#F4F5F7]'}`}
+                            >
+                                <span>{r.emoji}</span>
+                                <span className="font-bold">{r.count}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
-                {showComments && (
-                    <div className="pl-4 border-l-2 border-[#DFE1E6] space-y-3 mt-1">
+                <div className="flex items-center gap-3">
+                    {item.type !== 'group' && (
+                        <div 
+                            className="w-5 h-5 rounded-full text-white text-[10px] font-bold flex items-center justify-center shadow-sm"
+                            style={{ backgroundColor: item.author_color || '#DFE1E6' }}
+                            title={item.author_name}
+                        >
+                            {(item.author_name || 'U').charAt(0)}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Comments Section */}
+            {showComments && (
+                <div className="mt-2 border-t border-[#DFE1E6] pt-3 animate-in fade-in duration-200">
+                    <div className="space-y-3 mb-3 max-h-[200px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                         {item.comments.map(c => (
-                            <div key={c.id} className="text-sm">
-                                <span className="font-bold text-[#172B4D] mr-2">{c.author_name}</span>
-                                <span className="text-[#172B4D]">{c.text}</span>
+                            <div key={c.id} className="text-sm bg-[#FAFBFC] p-2 rounded border border-[#DFE1E6]/50">
+                                <div className="flex items-center justify-between mb-1">
+                                    <span className="font-bold text-xs text-[#172B4D]">{c.author_name}</span>
+                                    <span className="text-[10px] text-[#97A0AF]">Just now</span>
+                                </div>
+                                <p className="text-[#42526E] text-xs leading-relaxed">{c.text}</p>
                             </div>
                         ))}
-                        <div className="flex gap-2 mt-2">
-                            <input
-                                type="text"
-                                value={newCommentText}
-                                onChange={(e) => setNewCommentText(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleComment()}
-                                placeholder="Write a comment..."
-                                className="flex-1 border border-[#DFE1E6] rounded px-2 py-1 text-sm outline-none focus:border-[#4C9AFF]"
-                            />
-                            <button onClick={handleComment} disabled={!newCommentText.trim()} className="text-xs bg-[#F4F5F7] px-2 rounded font-bold hover:bg-[#EBECF0]">Post</button>
-                        </div>
                     </div>
-                )}
-            </div>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={newCommentText}
+                            onChange={(e) => setNewCommentText(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleComment()}
+                            placeholder="Add a thought..."
+                            className="flex-1 border border-[#DFE1E6] rounded-md px-3 py-1.5 text-xs outline-none focus:ring-2 focus:ring-[#4C9AFF] focus:border-transparent"
+                        />
+                        <button 
+                            onClick={handleComment} 
+                            disabled={!newCommentText.trim()} 
+                            className="text-xs font-bold text-white bg-[#0052CC] px-3 py-1.5 rounded-md hover:bg-[#0747A6] disabled:opacity-50 disabled:bg-[#EBECF0] disabled:text-[#A5ADBA] transition-colors"
+                        >
+                            Post
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

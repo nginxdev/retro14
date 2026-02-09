@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
-import { SmilePlus, Pencil } from 'lucide-react';
-import { RetroItem, User, VotingConfig } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { SmilePlus, Pencil, Trash2, Check, X } from 'lucide-react';
+import { RetroItem, User, VotingConfig, PermissionSettings } from '../../types';
 import { VoteControl } from './VoteControl';
 import { colors } from '../../utils/theme';
 
@@ -22,6 +22,8 @@ interface RetroCardProps {
     onReaction: (itemId: string, emoji: string) => void;
     onItemClick: (item: RetroItem) => void;
     onUpdateContent: (itemId: string, content: string) => void;
+    onDelete: (itemId: string) => void;
+    permissions: PermissionSettings;
     dragHandlers: {
         handleDragStart: (e: React.DragEvent, itemId: string) => void;
         handleDragOver: (e: React.DragEvent) => void;
@@ -39,12 +41,18 @@ interface RetroCardProps {
 export const RetroCard: React.FC<RetroCardProps> = ({ 
     item, currentUser, isVotingActive, votingConfig, userVotesUsed, 
     dragOverTargetId, draggedItemId,
-    onVote, onReaction, onItemClick, onUpdateContent, dragHandlers,
+    onVote, onReaction, onItemClick, onUpdateContent, onDelete, permissions, dragHandlers,
     isCardOverviewEnabled = true
 }) => {
     const [hoveredReactionId, setHoveredReactionId] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState(item.content);
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+    
+    // Sync editContent with item.content when item changes
+    useEffect(() => {
+        setEditContent(item.content);
+    }, [item.content]);
     
     const isTargeted = dragOverTargetId === item.id;
     const userVotes = (item.votes || {})[currentUser.id] || 0;
@@ -101,17 +109,52 @@ export const RetroCard: React.FC<RetroCardProps> = ({
                 {/* Author Color Strip */}
                 <div className="h-1.5 w-full rounded-t-[3px] shrink-0" style={{ backgroundColor: item.author_color || colors.n40 }}></div>
                 
-                {/* Controls Overlay - Edit (Top-Left) */}
-                {/* Only show pencil if Overview is Enabled (since disabling it makes the whole card clickable for edit) */}
-                {!isEditing && isCardOverviewEnabled && (
+                {/* Controls Overlay - Edit/Delete (Top-Left) */}
+                {!isEditing && (
                     <div className="absolute top-2 left-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <button 
-                            onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
-                            className="flex items-center justify-center w-7 h-7 rounded-full bg-n20 hover:bg-n30 border border-n40 text-n300 hover:text-b400 transition-colors shadow-sm"
-                            title="Quick Edit"
-                         >
-                             <Pencil size={14} />
-                         </button>
+                         {isCardOverviewEnabled ? (
+                             <button 
+                                onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}
+                                className="flex items-center justify-center w-7 h-7 rounded-full bg-n20 hover:bg-n30 border border-n40 text-n300 hover:text-b400 transition-colors shadow-sm"
+                                title="Quick Edit"
+                             >
+                                 <Pencil size={14} />
+                             </button>
+                         ) : (
+                             /* Show delete button when overview is disabled (if user has permission) */
+                             (item.user_id === currentUser.id || permissions.canDeleteOthersCards) && (
+                                 <button 
+                                    onClick={(e) => { e.stopPropagation(); setIsConfirmingDelete(true); }}
+                                    className="flex items-center justify-center w-7 h-7 rounded-full bg-n20 hover:bg-red-50 border border-n40 text-n300 hover:text-red-600 transition-colors shadow-sm"
+                                    title="Delete Card"
+                                 >
+                                     <Trash2 size={14} />
+                                 </button>
+                             )
+                         )}
+                    </div>
+                )}
+
+                {/* Inline Delete Confirmation Overlay */}
+                {isConfirmingDelete && (
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-4 animate-in fade-in duration-200">
+                        <p className="text-xs font-bold text-n600 mb-3 uppercase tracking-wider">Delete Card?</p>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); setIsConfirmingDelete(false); }}
+                                className="flex items-center justify-center w-8 h-8 rounded-full bg-n20 hover:bg-n30 text-n300 transition-colors border border-n40"
+                                title="Cancel"
+                            >
+                                <X size={16} />
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onDelete(item.id); setIsConfirmingDelete(false); }}
+                                className="flex items-center justify-center w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white transition-colors shadow-sm"
+                                title="Confirm Delete"
+                            >
+                                <Check size={16} />
+                            </button>
+                        </div>
                     </div>
                 )}
 

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Column, RetroItem, User, VotingConfig } from '../types';
+import { Column, RetroItem, User, VotingConfig, PermissionSettings } from '../types';
 import { BoardColumn } from './board/BoardColumn';
 import { ViewConfig } from '../hooks/useRetroBoard';
 
@@ -27,6 +27,8 @@ interface BoardProps {
   onToggleActionItem: (itemId: string, actionId: string) => void;
   onAddComment: (itemId: string, text: string) => void;
   onUpdateItemContent: (itemId: string, content: string) => void;
+  onDelete: (itemId: string) => void;
+  permissions: PermissionSettings;
   // Visibility State
   hiddenColumnIds: Set<string>;
   onToggleColumnVisibility: (columnId: string) => void;
@@ -46,7 +48,7 @@ export const Board: React.FC<BoardProps> = ({
     columns, items, currentUser, participants, sortedParticipants,
     onMoveItem, onItemClick, onAddItem, onPublishAll, onReaction, onGroupItem, onEditColumn,
     isVotingActive, votingConfig, userVotesUsed, onVote,
-    onAddActionItem, onToggleActionItem, onAddComment, onUpdateItemContent,
+    onAddActionItem, onToggleActionItem, onAddComment, onUpdateItemContent, onDelete, permissions,
     hiddenColumnIds, onToggleColumnVisibility,
     viewConfig, isCardOverviewEnabled, isLoading
 }) => {
@@ -197,6 +199,8 @@ export const Board: React.FC<BoardProps> = ({
             onToggleActionItem={onToggleActionItem}
             onAddComment={onAddComment}
             onUpdateItemContent={onUpdateItemContent}
+            onDelete={onDelete}
+            permissions={permissions}
             onHideColumn={onToggleColumnVisibility}
             dragHandlers={dragHandlers}
             globalViewConfig={viewConfig}

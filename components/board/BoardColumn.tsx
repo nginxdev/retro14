@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { MoreHorizontal, ArrowDownAZ, Check, Edit2, Send, ChevronDown, ChevronUp, Plus, Maximize2, Minimize2, EyeOff, Filter, Layers } from 'lucide-react';
-import { Column, RetroItem, User, VotingConfig } from '../../types';
+import { Column, RetroItem, User, VotingConfig, PermissionSettings } from '../../types';
 import { getThemeColors, getUniqueAuthors } from '../../utils/theme';
 import { ActionItemCard } from '../ActionItemCard';
 import { RetroCard } from './RetroCard';
@@ -46,6 +46,8 @@ interface BoardColumnProps {
     onToggleActionItem: (itemId: string, actionId: string) => void;
     onAddComment: (itemId: string, text: string) => void;
     onUpdateItemContent: (itemId: string, content: string) => void;
+    onDelete: (itemId: string) => void;
+    permissions: PermissionSettings;
     onHideColumn: (columnId: string) => void;
     onInputActive?: (columnId: string) => void;
     dragHandlers: any;
@@ -62,7 +64,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
     dragOverTargetId, draggedItemId, expandedGroups, isMaximized, isLoading, activeInputColumnId, onToggleMaximize,
     onMoveItem, onAddItem, onPublishAll, onEditColumn, onToggleSort, onToggleGroupByAuthor, onToggleAuthorFilter,
     onVote, onReaction, onItemClick, onGroupItem, onToggleGroup,
-    onAddActionItem, onToggleActionItem, onAddComment, onUpdateItemContent, onHideColumn, onInputActive,
+    onAddActionItem, onToggleActionItem, onAddComment, onUpdateItemContent, onDelete, permissions, onHideColumn, onInputActive,
     dragHandlers, globalViewConfig, isCardOverviewEnabled
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -146,6 +148,8 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
                         onAddActionItem={onAddActionItem}
                         onToggleActionItem={onToggleActionItem}
                         onAddComment={onAddComment}
+                        onReaction={onReaction}
+                        dragHandlers={dragHandlers}
                     />
                 </div>
             );
@@ -191,6 +195,8 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
                     onReaction={onReaction}
                     onItemClick={onItemClick}
                     onUpdateContent={onUpdateItemContent}
+                    onDelete={onDelete}
+                    permissions={permissions}
                     dragHandlers={dragHandlers}
                     isCardOverviewEnabled={isCardOverviewEnabled}
                 />
@@ -249,7 +255,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
                     </div>
                 ))}
                 {groups.length === 0 && (
-                    <EmptyState type={column.colorTheme} title="No items by author" />
+                    <EmptyState />
                 )}
             </div>
         );
@@ -390,7 +396,7 @@ export const BoardColumn: React.FC<BoardColumnProps> = ({
                         )}
                         
                         {publishedItems.length === 0 && (
-                            <EmptyState type={column.colorTheme} />
+                            <EmptyState />
                         )}
                     </>
                 )}
