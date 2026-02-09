@@ -27,7 +27,12 @@
    ```bash
    npm install
    ```
-3. Configure any required environment variables (e.g., Supabase credentials).
+3. Provide Supabase credentials as environment variables. Create a `.env` (or `.env.local`) at the project root with:
+   ```env
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGciOi...YourAnonKey...
+   ```
+   or set these variables in your shell/hosting environment before running `npm run dev` or `npm run build`.
 4. Run the development server:
    ```bash
    npm run dev
