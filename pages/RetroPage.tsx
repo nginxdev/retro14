@@ -269,17 +269,19 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
              <button 
                 onClick={() => setIsExportOpen(true)}
                 className="flex items-center gap-2 px-2 py-1 bg-n20 border border-n40 rounded text-xs text-n800 hover:bg-n30 transition-colors"
+                title="Export"
              >
                 <Download size={16} />
-                <span>Export</span>
+                <span className="hidden xl:inline">Export</span>
              </button>
 
              <button 
                 onClick={() => setIsShareOpen(true)}
                 className="bg-b400 text-white px-2 py-1 rounded font-bold text-xs hover:bg-b500 flex items-center transition-colors"
+                title="Share"
              >
-                <Share2 size={16} className="mr-2" />
-                Share
+                <Share2 size={16} className="xl:mr-2" />
+                <span className="hidden xl:inline">Share</span>
              </button>
            </div>
         </header>
