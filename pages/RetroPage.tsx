@@ -16,6 +16,7 @@ import { Share2, Vote, X, AlertTriangle, Eye, ChevronDown, Settings, Layers, Arr
 import { ExportModal } from '../components/ExportModal';
 import { useRetroBoard } from '../hooks/useRetroBoard';
 import { dataService } from '../services/dataService';
+import { SIDEBAR_BREAKPOINT } from '../utils/breakpoints';
 
 import { User } from '../types';
 
@@ -83,14 +84,11 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
     const [isExportOpen, setIsExportOpen] = useState(false);
     
     const sidebarRef = useRef<HTMLDivElement>(null);
-    
-    // Tailwind lg breakpoint is 1024px
-    const LG_BREAKPOINT = 1024;
 
     // Handle click outside sidebar on small screens to close it
     useEffect(() => {
       const handleClickOutside = (e: MouseEvent) => {
-        if (window.innerWidth < LG_BREAKPOINT && sidebarCollapsed === false) {
+        if (window.innerWidth < SIDEBAR_BREAKPOINT && sidebarCollapsed === false) {
           if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
             setSidebarCollapsed(true);
           }
@@ -104,10 +102,10 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
     // Handle window resize
     useEffect(() => {
       const handleResize = () => {
-        if (window.innerWidth >= LG_BREAKPOINT) {
+        if (window.innerWidth >= SIDEBAR_BREAKPOINT) {
           // On larger screens, allow sidebar to stay open
           // Don't force any state change here
-        } else if (window.innerWidth < LG_BREAKPOINT) {
+        } else if (window.innerWidth < SIDEBAR_BREAKPOINT) {
           // On smaller screens, collapse by default
           setSidebarCollapsed(true);
         }

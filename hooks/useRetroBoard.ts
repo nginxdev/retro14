@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { dataService } from "../services/dataService";
+import { SIDEBAR_BREAKPOINT } from "../utils/breakpoints";
 import {
   RetroItem,
   Column,
@@ -72,9 +73,9 @@ export const useRetroBoard = (user: User | undefined, sprintId: string) => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // Collapse sidebar by default on screens under Tailwind lg breakpoint (1024px)
+    // Collapse sidebar by default on screens under Tailwind xl breakpoint (1280px)
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 1024;
+      return window.innerWidth < SIDEBAR_BREAKPOINT;
     }
     return false;
   });
