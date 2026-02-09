@@ -71,7 +71,13 @@ export const useRetroBoard = (user: User | undefined, sprintId: string) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Collapse sidebar by default on screens under Tailwind lg breakpoint (1024px)
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 1024;
+    }
+    return false;
+  });
 
   const channelRef = useRef<RealtimeChannel | null>(null);
 
@@ -405,7 +411,7 @@ export const useRetroBoard = (user: User | undefined, sprintId: string) => {
   ) => {
     const item = items.find((i) => i.id === itemId);
 
-    // Permission check: Can only edit others' cards if permission is enabled
+    // Permission check: Can only edit other's cards if permission is enabled
     const isOwnCard = item?.user_id === currentUser.id;
     if (!isOwnCard && !permissions.canEditOthersCards) {
       return; // Silently ignore if no permission
@@ -481,7 +487,7 @@ export const useRetroBoard = (user: User | undefined, sprintId: string) => {
   ) => {
     const movedItem = items.find((i) => i.id === itemId);
 
-    // Permission check: Can only move others' cards if permission is enabled
+    // Permission check: Can only move other's cards if permission is enabled
     const isOwnCard = movedItem?.user_id === currentUser.id;
     if (!isOwnCard && !permissions.canMoveOthersCards) {
       return; // Silently ignore if no permission

@@ -132,7 +132,7 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({
                                 <Shield size={20} />
                             </div>
                             <div>
-                                <span className="block text-sm font-medium text-[#172B4D]">Move Others' Cards</span>
+                                <span className="block text-sm font-medium text-[#172B4D]">Move Other's Cards</span>
                                 <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to move cards created by others</span>
                             </div>
                         </div>
@@ -153,7 +153,7 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({
                                 <Shield size={20} />
                             </div>
                             <div>
-                                <span className="block text-sm font-medium text-[#172B4D]">Edit Others' Cards</span>
+                                <span className="block text-sm font-medium text-[#172B4D]">Edit Other's Cards</span>
                                 <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to edit content of cards created by others</span>
                             </div>
                         </div>
@@ -174,7 +174,7 @@ export const BoardSettingsModal: React.FC<BoardSettingsModalProps> = ({
                                 <Shield size={20} />
                             </div>
                             <div>
-                                <span className="block text-sm font-medium text-[#172B4D]">Delete Others' Cards</span>
+                                <span className="block text-sm font-medium text-[#172B4D]">Delete Other's Cards</span>
                                 <span className="block text-xs text-[#5E6C84] mt-0.5">Allow users to delete cards created by others</span>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Board } from '../components/Board';
 import { IssueDetailModal } from '../components/IssueDetailModal';
@@ -81,6 +81,41 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
     const [isTeamOpen, setIsTeamOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const [isExportOpen, setIsExportOpen] = useState(false);
+    
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    
+    // Tailwind lg breakpoint is 1024px
+    const LG_BREAKPOINT = 1024;
+
+    // Handle click outside sidebar on small screens to close it
+    useEffect(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (window.innerWidth < LG_BREAKPOINT && sidebarCollapsed === false) {
+          if (sidebarRef.current && !sidebarRef.current.contains(e.target as Node)) {
+            setSidebarCollapsed(true);
+          }
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [sidebarCollapsed]);
+
+    // Handle window resize
+    useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth >= LG_BREAKPOINT) {
+          // On larger screens, allow sidebar to stay open
+          // Don't force any state change here
+        } else if (window.innerWidth < LG_BREAKPOINT) {
+          // On smaller screens, collapse by default
+          setSidebarCollapsed(true);
+        }
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Sort: Hand raised first (by time), then others
     const sortedParticipants = [...participants].sort((a, b) => {
@@ -94,18 +129,20 @@ export const RetroPage: React.FC<RetroPageProps> = ({ user, sprintId, sprintName
 
   return (
     <div className="flex h-screen w-full bg-n10 overflow-hidden">
-            <Sidebar 
-                collapsed={sidebarCollapsed} 
-                onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
-                currentUser={currentUser}
-                onEditProfile={() => setIsProfileOpen(true)}
-                onOpenSettings={() => setIsSettingsOpen(true)}
-                onOpenTeam={() => setIsTeamOpen(true)}
-                onOpenHistory={() => setIsHistoryOpen(true)}
-                onSwitchSprint={onSwitchSprint}
-                sprintName={sprintName}
-                sprintCode={sprintCode}
-            />
+            <div ref={sidebarRef}>
+              <Sidebar 
+                  collapsed={sidebarCollapsed} 
+                  onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+                  currentUser={currentUser}
+                  onEditProfile={() => setIsProfileOpen(true)}
+                  onOpenSettings={() => setIsSettingsOpen(true)}
+                  onOpenTeam={() => setIsTeamOpen(true)}
+                  onOpenHistory={() => setIsHistoryOpen(true)}
+                  onSwitchSprint={onSwitchSprint}
+                  sprintName={sprintName}
+                  sprintCode={sprintCode}
+              />
+            </div>
 
       <div className="flex-1 flex flex-col min-w-0">
         <header className="relative h-14 bg-white border-b border-n40 flex items-center justify-between px-6 shrink-0 z-30">

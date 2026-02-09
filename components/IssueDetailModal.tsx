@@ -29,7 +29,7 @@ export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, current
   if (!item) return null;
 
   const handleSaveContent = async () => {
-    // Permission check: Can only edit others' cards if permission is enabled
+    // Permission check: Can only edit other's cards if permission is enabled
     const isOwnCard = item.user_id === currentUser.id;
     if (!isOwnCard && !permissions.canEditOthersCards) {
       return; // Silently ignore if no permission
@@ -42,7 +42,7 @@ export const IssueDetailModal: React.FC<ItemDetailModalProps> = ({ item, current
   };
 
   const handleConfirmDelete = async () => {
-    // Permission check: Can only delete others' cards if permission is enabled
+    // Permission check: Can only delete other's cards if permission is enabled
     const isOwnCard = item.user_id === currentUser.id;
     if (!isOwnCard && !permissions.canDeleteOthersCards) {
       setShowDeleteConfirm(false);
