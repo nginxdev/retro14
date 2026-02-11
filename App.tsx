@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { RetroPage } from './pages/RetroPage';
 import { SprintSelection } from './components/SprintSelection';
 import { Auth } from './components/Auth';
@@ -19,50 +20,70 @@ const stringToColor = (str: string) => {
   return '#' + '00000'.substring(0, 6 - c.length) + c;
 };
 
+// Wrapper for the Board Route to handle data fetching
+const BoardRoute = ({ user, onSignOut }: { user: User, onSignOut: () => void }) => {
+  const { code } = useParams<{ code: string }>();
+  const navigate = useNavigate();
+  const [sprint, setSprint] = useState<{ id: string, name: string, code: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (code) {
+      if (!/^[a-z0-9-]{4,20}$/i.test(code)) {
+        navigate('/', { replace: true });
+        return;
+      }
+      
+      const normalizedCode = code.toLowerCase();
+      setLoading(true);
+      
+      dataService.joinSprint(normalizedCode).then((s) => {
+        if (s) {
+          setSprint({ id: s.id, name: s.name, code: s.code });
+          // Ensure participant record
+          supabase!
+             .from("sprint_participants")
+             .upsert([{ sprint_id: s.id, user_id: user.id }], { onConflict: 'sprint_id,user_id' })
+             .then(({ error }) => {
+                 if (error) console.error("Error ensuring participant:", error);
+             });
+        } else {
+             console.warn('Board not found');
+             navigate('/', { replace: true });
+        }
+        setLoading(false);
+      });
+    }
+  }, [code, user.id, navigate]);
+
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-n10">
+        <Loader2 className="animate-spin text-b400" size={32} />
+      </div>
+    );
+  }
+
+  if (!sprint) return null;
+
+  return (
+    <RetroPage 
+      user={user} 
+      sprintId={sprint.id} 
+      sprintName={sprint.name}
+      sprintCode={sprint.code}
+      onSwitchSprint={() => navigate('/')}
+      onSignOut={onSignOut}
+    />
+  );
+};
+
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
-  const [isSwitchingSprint, setIsSwitchingSprint] = useState(false);
   const [dbUser, setDbUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [urlLoading, setUrlLoading] = useState(() => {
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const possibleCode = pathParts[0];
-    return !!(possibleCode && /^[A-Z0-9-]{4,20}$/i.test(possibleCode));
-  });
+  const navigate = useNavigate();
 
-  const [currentSprint, setCurrentSprint] = useState<{ id: string, name: string, code: string } | null>(() => {
-    try {
-      const pathParts = window.location.pathname.split('/').filter(Boolean);
-      const possibleCode = pathParts[0];
-
-      // If we have a URL code, don't use localStorage on initial load
-      if (possibleCode && /^[A-Z0-9-]{4,20}$/i.test(possibleCode)) {
-        return null;
-      }
-
-      const saved = localStorage.getItem('retro14-sprint');
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      console.error('Failed to parse sprint from local storage', e);
-      return null;
-    }
-  });
-
-  // Sync currentSprint to localStorage and URL
-  useEffect(() => {
-    if (currentSprint) {
-      localStorage.setItem('retro14-sprint', JSON.stringify(currentSprint));
-      if (window.location.pathname !== `/${currentSprint.code}`) {
-        window.history.pushState(null, '', `/${currentSprint.code}`);
-      }
-    } else if (!urlLoading) {
-      localStorage.removeItem('retro14-sprint');
-      if (window.location.pathname !== '/') {
-        window.history.pushState(null, '', '/');
-      }
-    }
-  }, [currentSprint, urlLoading]);
- 
   if (!isSupabaseConfigured) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-n10 p-4 text-center">
@@ -92,51 +113,6 @@ const App: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
-
-  // 2.5 URL Routing: Check for sprint code in URL
-  const checkUrlForSprint = async () => {
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const possibleCode = pathParts[0];
-
-    if (possibleCode && /^[a-z0-9-]{4,20}$/i.test(possibleCode)) {
-      const normalizedCode = possibleCode.toLowerCase();
-      const currentCode = currentSprint?.code?.toLowerCase();
-
-      if (!currentSprint || normalizedCode !== currentCode) {
-        setUrlLoading(true);
-        console.log('Fetching board from URL:', normalizedCode);
-        try {
-          const sprint = await dataService.joinSprint(normalizedCode);
-          if (sprint) {
-            setCurrentSprint({ id: sprint.id, name: sprint.name, code: sprint.code });
-          } else {
-            console.warn('Board from URL not found, falling back');
-          }
-        } finally {
-          setUrlLoading(false);
-        }
-      } else {
-        setUrlLoading(false);
-      }
-    } else {
-      setUrlLoading(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase?.auth.signOut();
-    setCurrentSprint(null);
-    setDbUser(null);
-  };
-
-  useEffect(() => {
-    checkUrlForSprint();
-
-    // Listen for URL changes (popstate)
-    const handlePopState = () => checkUrlForSprint();
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentSprint?.code]);
 
   // 3. Fetch User Profile from DB & Subscribe to Changes
   useEffect(() => {
@@ -193,24 +169,13 @@ const App: React.FC = () => {
     }
   }, [session]);
 
-  // 3.5 Ensure participant record exists for current sprint
-  useEffect(() => {
-    if (session?.user?.id && currentSprint?.id && dbUser && isSupabaseConfigured && supabase) {
-        console.log('Ensuring participant record for:', currentSprint.name);
-        supabase
-            .from("sprint_participants")
-            .upsert([{ sprint_id: currentSprint.id, user_id: session.user.id }], { onConflict: 'sprint_id,user_id' })
-            .then(({ error }) => {
-                if (error) {
-                    console.error("Error ensuring participant record:", error);
-                } else {
-                    console.log('Participant record confirmed');
-                }
-            });
-    }
-  }, [session, currentSprint, dbUser]);
+  const handleSignOut = async () => {
+    await supabase?.auth.signOut();
+    setDbUser(null);
+    navigate('/auth/login');
+  };
 
-  if (authLoading || urlLoading) {
+  if (authLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-n10">
         <Loader2 className="animate-spin text-b400" size={32} />
@@ -218,45 +183,37 @@ const App: React.FC = () => {
     );
   }
 
-  if (!session) {
-    return <Auth />;
-  }
+  // Define User object
+  const defaultName = session?.user.user_metadata.full_name || session?.user.email?.split('@')[0] || 'User';
+  const defaultColor = session?.user.id ? stringToColor(session.user.id) : '#000000';
 
-  // Map Supabase user to App User, preferring DB data
-  const defaultName = session.user.user_metadata.full_name || session.user.email?.split('@')[0] || 'User';
-  const defaultColor = stringToColor(session.user.id);
-
-  const appUser: User = {
+  const appUser: User = session ? {
     id: session.user.id,
     name: dbUser?.name || defaultName,
     role: dbUser?.role || 'Team Member',
     color: dbUser?.color || defaultColor,
     isHandRaised: dbUser?.isHandRaised || false,
     handRaisedAt: dbUser?.handRaisedAt
-  };
-
-  if (!currentSprint || isSwitchingSprint) {
-    return (
-      <SprintSelection 
-        user={appUser} 
-        onSprintSelected={(id, name, code) => {
-            setCurrentSprint({ id, name, code });
-            setIsSwitchingSprint(false);
-        }} 
-        onCancel={currentSprint ? () => setIsSwitchingSprint(false) : undefined}
-      />
-    );
-  }
+  } : { id: 'temp', name: 'temp', role: 'Team Member', color: '#000', isHandRaised: false };
 
   return (
-    <RetroPage 
-      user={appUser} 
-      sprintId={currentSprint.id} 
-      sprintName={currentSprint.name}
-      sprintCode={currentSprint.code}
-      onSwitchSprint={() => setIsSwitchingSprint(true)}
-      onSignOut={handleSignOut}
-    />
+    <Routes>
+      <Route path="/auth/*" element={!session ? <Auth /> : <Navigate to="/" replace />} />
+      <Route path="/" element={
+        session ? (
+            <SprintSelection 
+                user={appUser} 
+                onSprintSelected={(id, name, code) => navigate(`/${code}`)} 
+                onCancel={undefined}
+            />
+        ) : <Navigate to="/auth/login" replace />
+      } />
+      <Route path="/:code" element={
+        session ? (
+            <BoardRoute user={appUser} onSignOut={handleSignOut} />
+        ) : <Navigate to="/auth/login" replace />
+      } />
+    </Routes>
   );
 };
 

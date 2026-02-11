@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Loader2, ArrowRight, Lock, Mail, AlertTriangle, Check, ArrowLeft, Zap, Users, MessageSquare } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 type AuthView = 'login' | 'magic_link' | 'reset_password';
 
@@ -12,8 +13,31 @@ export const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   
+  const location = useLocation();
+  const navigate = useNavigate();
+
   // Cooldown logic
   const [cooldown, setCooldown] = useState(0);
+
+  // Sync state with URL
+  useEffect(() => {
+    const path = location.pathname;
+    if (path.includes('register')) {
+      setView('login');
+      setIsSignUp(true);
+    } else if (path.includes('forgot-password')) {
+      setView('reset_password');
+      setIsSignUp(false);
+    } else if (path.includes('send-magic-link')) {
+      setView('magic_link');
+      setIsSignUp(false);
+    } else {
+      // Default to login
+      setView('login');
+      setIsSignUp(false);
+    }
+    setMessage(null);
+  }, [location.pathname]);
 
   useEffect(() => {
     let timer: any;
@@ -86,35 +110,18 @@ export const Auth: React.FC = () => {
     }
   };
 
-  const switchToView = (targetView: AuthView) => {
-    setView(targetView);
-    setMessage(null);
-    if (email) {
-      triggerAutoSend(targetView);
-    }
-  };
-
-  const triggerAutoSend = async (targetView: AuthView) => {
-      if (cooldown > 0) return;
-      
-      setLoading(true);
-      setMessage(null);
-      try {
-        if (targetView === 'magic_link') {
-            const { error } = await supabase!.auth.signInWithOtp({ email });
-            if (error) throw error;
-            setMessage({ type: 'success', text: 'Check your inbox: a one-time link has been sent.' });
-        } else if (targetView === 'reset_password') {
-            const { error } = await supabase!.auth.resetPasswordForEmail(email);
-            if (error) throw error;
-            setMessage({ type: 'success', text: 'Reset instructions have been emailed to you.' });
+  const switchToView = (targetView: AuthView, targetIsSignUp?: boolean) => {
+    if (targetView === 'login') {
+        if (targetIsSignUp) {
+            navigate('/auth/register');
+        } else {
+            navigate('/auth/login');
         }
-        setCooldown(60);
-      } catch (error: any) {
-        setMessage({ type: 'error', text: error.message || 'Failed to send email.' });
-      } finally {
-        setLoading(false);
-      }
+    } else if (targetView === 'reset_password') {
+        navigate('/auth/forgot-password');
+    } else if (targetView === 'magic_link') {
+        navigate('/auth/send-magic-link');
+    }
   };
 
   // Render Logic
@@ -337,8 +344,7 @@ export const Auth: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => {
-                                setView('login');
-                                setMessage(null);
+                                switchToView('login');
                             }}
                             className="w-full flex items-center justify-center gap-2 text-sm text-n500 hover:text-n800 mt-4 font-medium transition-colors"
                         >
@@ -355,8 +361,7 @@ export const Auth: React.FC = () => {
                         {isSignUp ? 'Already have an account?' : "Don't have an account?"}
                         <button
                             onClick={() => {
-                                setIsSignUp(!isSignUp);
-                                setMessage(null);
+                                switchToView('login', !isSignUp);
                             }}
                             className="ml-1 text-b400 hover:text-b500 font-semibold focus:outline-none"
                         >
