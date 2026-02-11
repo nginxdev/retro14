@@ -40,9 +40,6 @@ export const TeamModal: React.FC<TeamModalProps> = ({ participants, onClose }) =
                              <Shield size={10} /> {user.role}
                          </p>
                      </div>
-                     <button className="p-2 text-[#5E6C84] hover:bg-[#EBECF0] rounded-full">
-                         <Mail size={16} />
-                     </button>
                 </div>
             ))}
         </div>

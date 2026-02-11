@@ -19,6 +19,12 @@ const COLORS = [
   '#00B8D9', // Teal
   '#C0546C', // Rose
   '#505F79', // Gray
+  '#8777D9', // Lilac
+  '#403294', // Deep Purple
+  '#0065FF', // Bright Blue
+  '#FFAB00', // Amber
+  '#253858', // Dark Slate
+  '#E34935', // Burnt Orange
 ];
 
 export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ user, onSave, onClose, onSignOut }) => {
@@ -77,16 +83,16 @@ export const UserProfileDialog: React.FC<UserProfileDialogProps> = ({ user, onSa
           </div>
         </div>
 
-        <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex flex-col gap-2">
+        <div className="p-4 border-t border-[#DFE1E6] bg-[#FAFBFC] flex justify-between items-center">
           <button
             onClick={onSignOut}
-            className="w-full px-2 py-1 text-xs font-bold text-[#BF2600] bg-[#FFEBE6] border border-[#BF2600] rounded hover:bg-[#FFDAC7] transition-colors"
+            className="px-2 py-1 text-xs font-bold text-[#BF2600] border border-transparent hover:border-[#BF2600] hover:bg-[#FFEBE6] rounded transition-colors"
           >
             Log out
           </button>
-          <div className="flex justify-end gap-2">
-            <button onClick={onClose} className="px-2 py-1 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
-            <button onClick={handleSave} className="px-2 py-1 text-xs font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded">Save</button>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="px-3 py-1.5 text-xs font-medium text-[#42526E] hover:bg-[#EBECF0] rounded">Cancel</button>
+            <button onClick={handleSave} className="px-3 py-1.5 text-xs font-bold text-white bg-[#0052CC] hover:bg-[#0747A6] rounded">Save</button>
           </div>
         </div>
       </div>
