@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RetroPage } from './pages/RetroPage';
 import { SprintSelection } from './components/SprintSelection';
 import { Auth } from './components/Auth';
@@ -78,11 +78,18 @@ const BoardRoute = ({ user, onSignOut }: { user: User, onSignOut: () => void }) 
   );
 };
 
+// Component to handle redirect to login while preserving the return location
+const RequireAuth = () => {
+  const location = useLocation();
+  return <Navigate to="/auth/login" state={{ from: location }} replace />;
+};
+
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [dbUser, setDbUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
 
   if (!isSupabaseConfigured) {
     return (
@@ -196,9 +203,11 @@ const App: React.FC = () => {
     handRaisedAt: dbUser?.handRaisedAt
   } : { id: 'temp', name: 'temp', role: 'Team Member', color: '#000', isHandRaised: false };
 
+  const redirectPath = location.state?.from?.pathname || "/";
+
   return (
     <Routes>
-      <Route path="/auth/*" element={!session ? <Auth /> : <Navigate to="/" replace />} />
+      <Route path="/auth/*" element={!session ? <Auth /> : <Navigate to={redirectPath} replace />} />
       <Route path="/" element={
         session ? (
             <SprintSelection 
@@ -206,12 +215,12 @@ const App: React.FC = () => {
                 onSprintSelected={(id, name, code) => navigate(`/${code}`)} 
                 onCancel={undefined}
             />
-        ) : <Navigate to="/auth/login" replace />
+        ) : <Navigate to="/auth/login" state={{ from: location }} replace />
       } />
       <Route path="/:code" element={
         session ? (
             <BoardRoute user={appUser} onSignOut={handleSignOut} />
-        ) : <Navigate to="/auth/login" replace />
+        ) : <RequireAuth />
       } />
     </Routes>
   );
