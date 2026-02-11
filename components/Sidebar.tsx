@@ -146,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         
         {!collapsed && (
             <div className="text-center">
-                <p className="text-[9px] text-[#A5ADBA] font-mono">v{__APP_VERSION__}-beta</p>
+                <p className="text-[9px] text-[#A5ADBA] font-mono">v{typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev'}</p>
             </div>
         )}
       </div>
