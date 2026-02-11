@@ -10,7 +10,9 @@ export const Auth: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
   
   const location = useLocation();
@@ -56,9 +58,17 @@ export const Auth: React.FC = () => {
 
     try {
       if (isSignUp) {
+        if (!agreed) {
+            throw new Error("You must agree to the Terms and Conditions.");
+        }
         const { error } = await supabase!.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: name,
+            },
+          },
         });
         if (error) throw error;
         setMessage({ type: 'success', text: 'Registration successful! Check your email to confirm.' });
@@ -230,6 +240,25 @@ export const Auth: React.FC = () => {
                 /* Standard Login / Signup Form */
                 <>
                     <form onSubmit={handleAuth} className="space-y-4">
+                        {isSignUp && (
+                            <div className="space-y-1">
+                                <label className="block text-xs font-semibold text-n500 uppercase tracking-wide">Name</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <Users size={16} className="text-n300" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="block w-full pl-9 pr-3 py-2 bg-n10 border border-n40 rounded-[3px] text-n800 placeholder-n300 focus:outline-none focus:ring-2 focus:ring-b50 focus:border-b200 transition-all text-sm"
+                                        placeholder="Your Name"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-1">
                         <label className="block text-xs font-semibold text-n500 uppercase tracking-wide">Email</label>
                         <div className="relative">
@@ -250,6 +279,7 @@ export const Auth: React.FC = () => {
                         <div className="space-y-1">
                         <div className="flex justify-between items-center">
                             <label className="block text-xs font-semibold text-n500 uppercase tracking-wide">Password</label>
+                             {!isSignUp && (
                              <button
                                 type="button"
                                 onClick={() => switchToView('reset_password')}
@@ -257,6 +287,7 @@ export const Auth: React.FC = () => {
                                 >
                                 Forgot password?
                             </button>
+                             )}
                         </div>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -273,6 +304,29 @@ export const Auth: React.FC = () => {
                             />
                         </div>
                         </div>
+
+                        {isSignUp && (
+                            <div className="flex items-start gap-2 pt-2">
+                                <div className="flex items-center h-5">
+                                    <input
+                                        id="terms"
+                                        name="terms"
+                                        type="checkbox"
+                                        checked={agreed}
+                                        onChange={(e) => setAgreed(e.target.checked)}
+                                        className="w-4 h-4 rounded border-n100 text-b400 focus:ring-b400 cursor-pointer"
+                                    />
+                                </div>
+                                <div className="text-sm">
+                                    <label htmlFor="terms" className="text-n600">
+                                        I agree to the <a href="/terms" target="_blank" className="text-b400 hover:text-b500 font-medium hover:underline">Terms and Conditions</a>
+                                    </label>
+                                    <p className="text-xs text-n400 mt-0.5">
+                                        Beta service: No uptime or data guarantee.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
                         <button
                             type="submit"

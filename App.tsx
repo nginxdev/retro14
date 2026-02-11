@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { RetroPage } from './pages/RetroPage';
+import { Terms } from './pages/Terms';
 import { SprintSelection } from './components/SprintSelection';
 import { Auth } from './components/Auth';
 import { supabase, isSupabaseConfigured } from './lib/supabaseClient';
@@ -207,6 +208,7 @@ const App: React.FC = () => {
 
   return (
     <Routes>
+      <Route path="/terms" element={<Terms />} />
       <Route path="/auth/*" element={!session ? <Auth /> : <Navigate to={redirectPath} replace />} />
       <Route path="/" element={
         session ? (
